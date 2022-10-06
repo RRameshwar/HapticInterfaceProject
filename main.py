@@ -24,10 +24,23 @@ if __name__ == '__main__':
 		gl.moveHIP([0.1,0,0])
 		# #find new position for HIP
 		# hip.updatePos(newPos) #maybe have to rewrite the update function
-		# is_coll = coll.detectCollision(pyr, hip)
+		# is_coll, prims = coll.detectCollision(pyr, hip) #returns a boolean and a list of primitives (faces)
+
+		if is_coll:
+			if hip.has_collided = False:  #we have not collided with the object yet
+				hip.has_collided = True   #we have now!
+				hip.entry_point = prims
+
+			else: #we have already collided, this is a second collision
+				if prims == hip.entry_point: #we collided with the same primitive that we entered, so it's a clear exit
+					hip.has_collided = False
+					hip.entry_point = []
+
+		if hip.has_collided:
+			hip.calculateGodObject()
 		
 		
-		gl.render()
+		gl.render(god_object=hip.has_collided)
 
 
 

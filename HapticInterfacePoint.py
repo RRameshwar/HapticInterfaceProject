@@ -38,7 +38,7 @@ class HapticInterfacePoint():
 
 		cross_product = np.cross(edge1, edge2)
 
-		#print(cross_product)
+		#print(cross_product)            
 
 		a = cross_product[0]
 		b = cross_product[1]

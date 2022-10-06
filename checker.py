@@ -8,11 +8,16 @@ class CollisionChecker():
 
 	def detectCollision(object, hip):
 		prims = []
+		is_coll = False
 		for face in object.faces:
 			points = []
 			for i in range(0,3):
 				points.append(object.vertices[face[i]])
-			self.detectCollision_primitive(points, hip.current_position)
+			if detectCollision_primitive(points, hip.current_position):
+				prims.append(face)
+				is_coll = True
+
+		return is_coll, prims 
 
 	def detectCollision_primitive(self, tri, p):
 	    ## Detect collision between a point and a triangle

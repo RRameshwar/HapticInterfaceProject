@@ -10,7 +10,7 @@ class render_environment():
 		pg.init()
 		pg.display.set_mode(self.display, DOUBLEBUF|OPENGL)
 		glMatrixMode(GL_PROJECTION)
-		gluPerspective(45, (self.display[0]/self.display[1]), 0.1, 50.0)
+		gluPerspective(70, (self.display[0]/self.display[1]), 0.5, 50.0)
 		glTranslatef(0.0, 0.0, -10)
 
 		glMatrixMode(GL_MODELVIEW)
@@ -57,9 +57,10 @@ class render_environment():
 
 		# glPushMatrix()
 		
-		glTranslatef(*self.transf)
+		
 		
 		self.drawStaticObj()
+		glTranslatef(*self.transf)
 
 		# transMat = move
 		# [-i,0,0]
