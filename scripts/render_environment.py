@@ -46,29 +46,25 @@ class render_environment():
 		glEnd()
 
 
-	def render(self,t=0,transf=[0,0,0]):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
+	def render(self):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
 		
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				pg.quit()
 				quit()
 
+		glMatrixMode(GL_MODELVIEW)
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
 
-		# glPushMatrix()
-		
+		glPushMatrix()
 		glTranslatef(*self.transf)
-		
-		self.drawStaticObj()
-
-		# transMat = move
-		# [-i,0,0]
-		# glTranslatef(*transMat)
-
 		self.drawHIP()
 
-		# glPopMatrix()
-		
+		glPopMatrix()
+
+		self.drawStaticObj()
+
+
 		# newVertex = pointVertex + np.array(transMat)
 		# print(newVertex)
 		# detectCollision(triangleVertices,newVertex)
