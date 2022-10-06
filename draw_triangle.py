@@ -16,7 +16,6 @@ pointVertex = (0.25,0.25,0)
 
 
 def triangle():
-    glPointSize(5)
     glBegin(GL_LINES)
     for edge in triangleEdges:
         for vertex in edge:
@@ -25,8 +24,9 @@ def triangle():
 
 
 def point():
+    glPointSize(5)
     glBegin(GL_POINTS)
-    glVertex3f(pointVertex[0], pointVertex[1], pointVertex[2])
+    glVertex3f(*pointVertex)
     glEnd()
 
 
@@ -84,21 +84,21 @@ def main():
 
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT) # This must go before we draw our objects
 
-        glMatrixMode(GL_MODELVIEW)
+        # glMatrixMode(GL_MODELVIEW)
         
-        glPushMatrix()
+        # glPushMatrix()
         
-        triangle()
+        # triangle()
 
-        i += 0.05
-        transMat = [-i,0,0]
-        glTranslatef(*transMat)
+        # i += 0.05
+        # transMat = [-i,0,0]
+        # glTranslatef(*transMat)
         point()
-        glPopMatrix()
+        # glPopMatrix()
         
-        newVertex = pointVertex + np.array(transMat)
+        # newVertex = pointVertex + np.array(transMat)
         # print(newVertex)
-        detectCollision(triangleVertices,newVertex)
+        # detectCollision(triangleVertices,newVertex)
         
 
         pg.display.flip()
