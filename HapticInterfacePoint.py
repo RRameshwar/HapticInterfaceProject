@@ -7,12 +7,12 @@ from OpenGL.GLU import *
 import numpy as np
 
 class HapticInterfacePoint():
-	def __init__(initial_position=[0, 0, 0]):
+	def __init__(self, initial_position=[0, 0, 0]):
 		self.current_position = initial_position
 		self.previous_position = initial_position
 
 		self.has_collided = False
-		self.god_object_pos = []
+		self.god_object_pos = [0, 0, 0]
 
 		self.entry_point = []
 
@@ -34,11 +34,15 @@ class HapticInterfacePoint():
 		edge1 = [x2-x1, y2-y1, z2-z1]
 		edge2 = [x3-x1, y3-y1, z3-z1]
 
+		#print(edge1, edge2)
+
 		cross_product = np.cross(edge1, edge2)
+
+		#print(cross_product)
 
 		a = cross_product[0]
 		b = cross_product[1]
-		c = cross_product[3]
+		c = cross_product[2]
 
 		d = a*-1*x1 + b*-1*x2 + c*-1*x3
 
@@ -63,26 +67,40 @@ class HapticInterfacePoint():
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		A = [[1, 0, 0, consts[0][0], consts[0][1], consts[0][2]]
-			[0, 1, 0, consts[1][0], consts[1][1], consts[1][2]]
-			[0, 0, 1, consts[2][0], consts[2][1], consts[2][2]]
-			[consts[0][0], consts[1][0], consts[2][0], 0, 0, 0]
-			[consts[0][1], consts[1][1], consts[2][1], 0, 0, 0]
-			[consts[0][2], consts[1][2], consts[2][2], 0, 0, 0]]
-	 	
+		print(consts)
 
-	 	B = [self.current_position[0], self.current_position[1], self.current_position[2], consts[0][0], consts[1][0], consts[2][0]]
+		# A = [
+		# 	[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
+		# 	[0, 1, 0, consts[0][1], consts[1][1], consts[2][1]],
+		# 	[0, 0, 1, consts[0][2], consts[1][2], consts[2][2]],
+		# 	[consts[0][0], consts[0][1], consts[0][2], 0, 0, 0],
+		# 	[consts[1][0], consts[1][1], consts[1][2], 0, 0, 0],
+		# 	[consts[2][0], consts[2][1], consts[2][2], 0, 0, 0]]
 
-	 	# A = 
-	 	# [1  0  0  a1 a2 a3
-	 	#  0  1  0  b1 b2 b3
-	 	#  0  0  1  c1 c2 c3
-	 	#  a1 b1 c1  0 0  0
-	 	#  a2 b2 c2  0 0  0
-	 	#  a3 b3 c3  0 0  0 ]
+		A = [
+			[1, 0, 0, consts[0][0]],
+			[0, 1, 0, consts[0][1]],
+			[0, 0, 1, consts[0][2]],
+			[consts[0][0], consts[0][1], consts[0][2], 1]]
 
-	 	x_godobj = np.linalg.inv(A) * B
-	 	self.god_object_pos = [x_godobj[0], x_godobj[1], x_godobj[2]]
+		print(A)
+		
+
+		B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][0]])
+
+		# A = 
+		# [1  0  0  a1 a2 a3
+		#  0  1  0  b1 b2 b3
+		#  0  0  1  c1 c2 c3
+		#  a1 b1 c1  0 0  0
+		#  a2 b2 c2  0 0  0
+		#  a3 b3 c3  0 0  0 ]
+
+		x_godobj = np.dot(np.linalg.inv(A), B)
+
+		print(x_godobj)
+
+		self.god_object_pos = [x_godobj[0], x_godobj[1], x_godobj[2]]
 
 	def calculateForce():
 		k = [17, 17, 17]
@@ -92,11 +110,21 @@ class HapticInterfacePoint():
 
 
 def main():
-	hip = HapticInterfacePoint()
+	hip = HapticInterfacePoint(initial_position = [2, 2, 2])
+
+	triangleVertices = ((0,0,0),(10,0,0),(0,10,0))
+
+	triangleVertices = [list(tup) for tup in triangleVertices]
+
+	hip.calculateGodObject([triangleVertices])
+
+	print(hip.god_object_pos)
 
 
 
 if __name__ == '__main__':
 	main()
+
+	
 
 
