@@ -12,7 +12,8 @@ class render_environment():
 		glMatrixMode(GL_PROJECTION)
 		gluPerspective(70, (self.display[0]/self.display[1]), 0.5, 50.0)
 		
-		glTranslatef(0.0, 0.0, -10)
+		glRotatef(90, 0, 0, 1)
+		glTranslatef(0.0, 0.0, -5)
 
 		glMatrixMode(GL_MODELVIEW)
 		glLoadIdentity()
@@ -43,6 +44,11 @@ class render_environment():
 		self.hipVert = vertex
 		self.hipSize = size
 
+
+	# def drawOrigin(self):
+	# 	glBegin()
+			
+	# 	glEnd()
 
 	def drawStaticObj(self):
 		glBegin(GL_LINES)
@@ -117,10 +123,10 @@ class render_environment():
 			glPushMatrix()
 			glTranslatef(*self.transf)
 			self.drawHIP()			
-
-			self.drawStaticObj()
-
 			glPopMatrix()
+			self.drawStaticObj() # Need to draw the object after push/pop 
+
+			# glPopMatrix()
 
 
 

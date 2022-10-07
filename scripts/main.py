@@ -28,13 +28,16 @@ if __name__ == '__main__':
 	i = 0.01
 
 	run = gl.render()
-	while run==True:
+	while run == True:
 		run = gl.render()
-
+		coll.detectCollision(pyr,hip)
 		# if i < 1:
 		# 	gl.moveHIP([i,0,0])
 		# else:
-		# 	gl.moveHIP([0,i,0])
+
+		T = [i, 1.25, 0]
+		hip.updatePos(T)
+		gl.moveHIP([i,1.25,0])
 				
 		# # #find new position for HIP
 		# # hip.updatePos(newPos) #maybe have to rewrite the update function
@@ -57,7 +60,7 @@ if __name__ == '__main__':
 		
 		# gl.render(god_object=hip.has_collided)
 
-		# i += 0.01
+		i += 0.01
 
 
 
