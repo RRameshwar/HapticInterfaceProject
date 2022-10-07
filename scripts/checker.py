@@ -20,6 +20,10 @@ class CollisionChecker():
 		return is_coll, prims 
 
 	def detectCollision_primitive(self, tri, p):
+
+		self.detectCollision_primitive_intersection()
+
+	def detectCollision_primitive_intersection(self, tri, p):
 	    ## Detect collision between a point and a triangle
 	    tri = np.array(tri)
 	    p = np.array(p)

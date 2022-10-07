@@ -55,6 +55,15 @@ class HapticInterfacePoint():
 		#build large matrix A and solution vector b --> Ax = b (case for 1, 2, and 3 planes)
 		#self.god_object_pos =  A-1 * b
 
+
+		#Keep track of old god object position
+		# Check if we need to update primitive list 
+				# test for line segment collision with each triangle in possible list
+				# if true, update active primitive list
+				   # and find new adjacent triangles for possible list (yikes)
+				# update plane constraints with active list
+				#calculate new god object position
+
 		consts = np.zeros([3,4])
 
 		for i in range(0, 3):
