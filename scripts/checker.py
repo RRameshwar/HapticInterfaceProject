@@ -1,23 +1,24 @@
 import numpy as np
-
+import time
 
 class CollisionChecker():
 	def __init():
 		pass
 
 	def detectCollision(self, object, hip):
+		print("DETECTING COLLISION SET")
 		colliding_faces = []
 		is_coll = False
 		for i in range(0, len(object.faces)):
 			face = object.faces[i]
 			triangle_vertices = []
-			for j in range(0,3): # 0-3 for pyramid (4 faces)
+			for j in range(0,len(face)): # 0-3 for pyramid (4 faces)
 				triangle_vertices.append(object.vertices[face[j]])
 			if self.detectCollision_line_test(triangle_vertices, hip):
-				print("Colliding face: ", face)
 				colliding_faces.append(i)
 				is_coll = True
 
+		print("FINAL RETURN: ", colliding_faces)
 		return is_coll, colliding_faces 
 
 
@@ -33,10 +34,12 @@ class CollisionChecker():
 		# print("Triangle Vertices: ", tri)
 		# print("Current Position: ", hipPos)
 		# print("Previos Position: ", godPos)
-		# print("-----------")
 
 		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
 		d_b = np.dot(np.subtract(godPos, tri[0]), n) # Distance of god obj from plane
+
+		# print("Signed distances to plane: ", d_a, d_b)
+		# print("-----------")
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			lineCollision = False
@@ -44,11 +47,14 @@ class CollisionChecker():
 			lineCollision = True
 
 		if lineCollision:
-			print("Signed distances to plane: ", d_a, d_b)
-			print("\nLine Collision! Checking if point intersects a face...")
+			print()
+			print("Line Collision! Checking if point intersects a face...")
+			time.sleep(2)
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
 			print("intersection point: ", intersect_point)
-			return self.detectCollision_primitive_test_2(tri, intersect_point)
+			print()
+			return self.detectCollision_primitive_test(tri, intersect_point)
+
 			
 		else:
 			return False
@@ -82,11 +88,11 @@ class CollisionChecker():
 	    v = np.subtract(tri[2], tri[0])
 	    w = np.subtract(p, tri[0])
 
-	    # alpha = -(np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
-	    # beta = -(np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+	    alpha = (np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+	    beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 
-	    alpha = np.dot(w,v)/np.dot(u,v)
-	    beta = np.dot(w,u)/np.dot(u,v)
+	    # alpha = np.dot(w,v)/np.dot(u,v)
+	    # beta = np.dot(w,u)/np.dot(u,v)
 
 	    # Check collision conditions as a boolean list
 	    check = [alpha>=0, beta>=0, alpha+beta<=1]

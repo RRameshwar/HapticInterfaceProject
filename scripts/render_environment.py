@@ -67,9 +67,9 @@ class render_environment():
 		
 		for i in range(0, len(self.staticFaces)):
 			if i in prims:
-				glColor4f(0,1,0,1)
+				glColor4f(0,1,0,0.3)
 			else:
-				glColor4f(1,0,0,1)
+				glColor4f(1,0,0,0.3)
 			for vertex in self.staticFaces[i]:
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()

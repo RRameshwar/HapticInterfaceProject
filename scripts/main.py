@@ -18,7 +18,15 @@ if __name__ == '__main__':
 	#dod = ModelObject('dodecahedron.obj')
 	dod = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
+	# cubeVertices = ((1,1,1),(1,1,-1),(1,-1,-1),(1,-1,1),(-1,1,1),(-1,-1,-1),(-1,-1,1),(-1,1,-1))
+	# cubeEdges = ((0,1),(0,3),(0,4),(1,2),(1,7),(2,5),(2,3),(3,6),(4,6),(4,7),(5,6),(5,7))
+	# cubeQuads = ((0,3,6,4),(2,5,6,3),(1,2,5,7),(1,0,4,7),(7,4,6,5),(2,3,0,1))
+
+	# dod = Cube(cubeVertices, cubeEdges, cubeQuads)
+
 	coll = CollisionChecker() # From checker.py
+
+	
 
 	pointVertex = (1.5, 1.5 , -1.5)
 
@@ -35,17 +43,12 @@ if __name__ == '__main__':
 		
 		is_coll, prims = coll.detectCollision(dod,hip) # returns a boolean and a list of primitives (indices of the face list)
 
-		print("Current HIP position ", hip.current_position)
-
 		if not is_coll:
 			T = [0, 0, i]
 			hip.updatePos(T) # find new position for HIP
 			gl.moveHIP(T)
 		else:
 			print("Collided!")
-			print("Current HIP Position: ", hip.current_position)
-			print("Coliding face indices: ", prims)
-
 			pg.quit()
 
 		run = gl.render(prims)
