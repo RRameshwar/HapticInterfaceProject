@@ -20,17 +20,19 @@ if __name__ == '__main__':
 
 	coll = CollisionChecker() # From checker.py
 
-	pointVertex = (-2.0, -2.0 ,0)
+	pointVertex = (2.0, 2.0 ,0)
 
 	gl.createStaticObj(dod.vertices, dod.edges, dod.faces)
 	gl.createHIP(pointVertex)
 
 	i = 0.01
 
-	run = gl.render()
+	prims = []
+	run = gl.render(prims)
+	
 	while run == True:
-		run = gl.render()
-		is_coll, prims = coll.detectCollision(dod,hip) # returns a boolean and a list of primitives (faces)
+		
+		is_coll, prims = coll.detectCollision(dod,hip) # returns a boolean and a list of primitives (indices of the face list)
 
 		if not is_coll:
 			T = [i, 1.25, 0]
@@ -38,6 +40,9 @@ if __name__ == '__main__':
 			gl.moveHIP([i,1.25,0])
 		else:
 			print("Collided!")
+			print(hip.current_position)
+
+		run = gl.render(prims)
 				
 
 		# 	else: #we have already collided, this is a second collision

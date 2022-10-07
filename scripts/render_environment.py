@@ -61,11 +61,15 @@ class render_environment():
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
 
-	def drawStaticObjSolid(self):
+	def drawStaticObjSolid(self,prims):
 		glBegin(GL_TRIANGLES)
-		glColor4f(1,0,0,0.5)
-		for face in self.staticFaces:
-			for vertex in face:
+		
+		for i in range(0, len(self.staticFaces)):
+			if i in prims:
+				glColor4f(0,1,0,0.5)
+			else:
+				glColor4f(1,0,0,0.5)
+			for vertex in self.staticFaces[i]:
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
 
@@ -78,7 +82,7 @@ class render_environment():
 		glEnd()
 
 
-	def render(self):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
+	def render(self, prims):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				self.run = False
@@ -137,7 +141,7 @@ class render_environment():
 			glTranslatef(*self.transf)
 			self.drawHIP()			
 			glPopMatrix()
-			self.drawStaticObjSolid() # Need to draw the object after push/pop 
+			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
 
 			# glPopMatrix()
 
