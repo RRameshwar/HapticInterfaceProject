@@ -39,10 +39,28 @@ class CollisionChecker():
 			print(tri)
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
 			print(intersect_point)
-			return self.detectCollision_primitive_test(tri, intersect_point)
+			return self.detectCollision_primitive_test_2(tri, intersect_point)
 			
 		else:
 			return False
+
+
+	def detectCollision_primitive_test_2(self,tri,p):
+		tri_translated = []
+		for point in tri:
+			tri_translated.append(np.subtract(point, p))
+
+		u = np.cross(tri_translated[0], tri_translated[1])
+		v = np.cross(tri_translated[0], tri_translated[2])
+		w = np.cross(tri_translated[1], tri_translated[2])
+
+		if np.dot(u,v) < 0:
+			return False
+		if np.dot(u,w) < 0:
+			return False
+
+		print("Primitive Collision Detected!")
+		return True
 
 
 	def detectCollision_primitive_test(self, tri, p):
