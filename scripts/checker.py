@@ -21,13 +21,13 @@ class CollisionChecker():
 
 	def detectCollision_line_test(self, tri, hip):
 
-		## Detect collision between line segment and a face
+		## Detect collision between line segment and a face (triangle)
 		n = np.cross(np.subtract(tri[1], tri[0]), np.subtract(tri[2], tri[0]))
 		hipPos = hip.current_position
 		godPos = hip.god_object_pos
 
-		d_a = np.dot(np.subtract(hipPos, tri[0]), n)
-		d_b = np.dot(np.subtract(godPos, tri[0]), n)
+		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
+		d_b = np.dot(np.subtract(godPos, tri[0]), n) # Distance of god obj from plane
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			lineCollision = False
@@ -35,7 +35,7 @@ class CollisionChecker():
 			lineCollision = True
 
 		if lineCollision:
-			print("lineCollision")
+			print("\nLine Collision! Checking if point intersects a face...")
 			print(tri)
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
 			print(intersect_point)
@@ -50,12 +50,12 @@ class CollisionChecker():
 	    tri = np.array(tri)
 	    p = np.array(p)
 
-	    u = tri[1] - tri[0]
-	    v = tri[2] - tri[0]
-	    w = p - tri[0]
+	    u = np.subtract(tri[1], tri[0])
+	    v = np.subtract(tri[2], tri[0])
+	    w = np.subtract(p, tri[0])
 
-	    #alpha = -(np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
-	    #beta = -(np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+	    # alpha = -(np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+	    # beta = -(np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 
 	    alpha = np.dot(w,v)/np.dot(u,v)
 	    beta = np.dot(w,u)/np.dot(u,v)
@@ -63,16 +63,16 @@ class CollisionChecker():
 	    # Check collision conditions as a boolean list
 	    check = [alpha>=0, beta>=0, alpha+beta<=1]
 
-	    if alpha>= 0:
-	        print("alpha high")
+	    # if alpha>= 0:
+	    #     print("alpha high")
 
 	    if all(check):
-	        print("\nCollision Detected!")
-	        print(alpha, beta)
+	        print("\nPrimitive Collision Detected!")
+	        print(round(alpha,3), round(beta,3))
 	        print(check)
 	    else:
-	        print('\nNo Detection...')
-	        print(alpha, beta)
+	        print('\nNo Primitive Collision Detected...')
+	        print(round(alpha,3), round(beta,3))
 	        print(check)
 
 	    return all(check)

@@ -30,27 +30,15 @@ if __name__ == '__main__':
 	run = gl.render()
 	while run == True:
 		run = gl.render()
-		is_coll, prims = coll.detectCollision(dod,hip)
-		# if i < 1:
-		# 	gl.moveHIP([i,0,0])
-		# else:
+		is_coll, prims = coll.detectCollision(dod,hip) # returns a boolean and a list of primitives (faces)
 
 		if not is_coll:
 			T = [i, 1.25, 0]
-			hip.updatePos(T)
+			hip.updatePos(T) # find new position for HIP
 			gl.moveHIP([i,1.25,0])
 		else:
 			print("Collided!")
 				
-		# # #find new position for HIP
-		# # hip.updatePos(newPos) #maybe have to rewrite the update function
-
-		# # is_coll, prims = coll.detectCollision(pyr, hip) #returns a boolean and a list of primitives (faces)
-
-		# if is_coll:
-		# 	if hip.has_collided = False:  #we have not collided with the object yet
-		# 		hip.has_collided = True   #we have now!
-		# 		hip.entry_point = prims
 
 		# 	else: #we have already collided, this is a second collision
 		# 		if prims == hip.entry_point: #we collided with the same primitive that we entered, so it's a clear exit

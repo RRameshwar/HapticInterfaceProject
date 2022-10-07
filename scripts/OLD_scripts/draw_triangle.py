@@ -31,7 +31,7 @@ def point():
 
 
 
-def detectCollision(tri, p):
+def detectCollision_temp(tri, p):
 
     ## Detect collision between a point and a triangle
     tri = np.array(tri)
@@ -88,7 +88,7 @@ def main():
         
         # glPushMatrix()
         
-        # triangle()
+        triangle()
 
         # i += 0.05
         # transMat = [-i,0,0]
@@ -98,7 +98,7 @@ def main():
         
         # newVertex = pointVertex + np.array(transMat)
         # print(newVertex)
-        # detectCollision(triangleVertices,newVertex)
+        detectCollision_temp(triangleVertices,newVertex)
         
 
         pg.display.flip()
