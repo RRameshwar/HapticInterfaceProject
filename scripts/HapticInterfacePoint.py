@@ -28,11 +28,14 @@ class HapticInterfacePoint():
 	# 	self.current_position = [newx, newy]
 
 	def updatePos(self, transformation):
-		newHipPos = np.add(self.initial_position, transformation)
-		
+
 		self.previous_position = self.current_position
-		self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
-		self.current_position = newHipPos
+
+		self.current_position = np.add(self.current_position, transformation)
+				
+		if not self.has_collided:
+			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
+
 
 
 	def calcPlaneFromPrim(self, prim):

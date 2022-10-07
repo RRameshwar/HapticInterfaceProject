@@ -88,15 +88,22 @@ class render_environment():
 		glEnd()
 
 
-	def drawHIP(self):
+	def drawHIP(self, position):
 		glPointSize(self.hipSize)
 		glBegin(GL_POINTS)
 		glColor3f(1,1,1)
-		glVertex3f(*self.hipVert)
+		glVertex3f(*position)
+		glEnd()
+
+	def drawGodObject(self, position):
+		glPointSize(self.hipSize)
+		glBegin(GL_POINTS)
+		glColor3f(0,1,1)
+		glVertex3f(*position)
 		glEnd()
 
 
-	def render(self, prims):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
+	def render(self, prims, hip_position, god_position):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				self.run = False
@@ -151,10 +158,9 @@ class render_environment():
 			glMatrixMode(GL_MODELVIEW)
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
 
-			glPushMatrix()
-			glTranslatef(*self.transf)
-			self.drawHIP()			
-			glPopMatrix()
+			self.drawHIP(hip_position)			
+
+			self.drawGodObject(god_position)
 
 			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
 			self.drawStaticObj()

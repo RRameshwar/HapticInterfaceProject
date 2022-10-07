@@ -49,7 +49,6 @@ class CollisionChecker():
 		if lineCollision:
 			print()
 			print("Line Collision! Checking if point intersects a face...")
-			time.sleep(2)
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
 			print("intersection point: ", intersect_point)
 			print()
@@ -90,9 +89,6 @@ class CollisionChecker():
 
 	    alpha = (np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 	    beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
-
-	    # alpha = np.dot(w,v)/np.dot(u,v)
-	    # beta = np.dot(w,u)/np.dot(u,v)
 
 	    # Check collision conditions as a boolean list
 	    check = [alpha>=0, beta>=0, alpha+beta<=1]
