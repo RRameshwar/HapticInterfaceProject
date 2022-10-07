@@ -8,16 +8,21 @@ from HapticInterfacePoint import *
 from render_environment import *
 from pyramid import *
 from checker import *
+from modelObject import *
+
+import pywavefront
 
 if __name__ == '__main__':
 	gl = render_environment()
 	hip = HapticInterfacePoint()
-	pyr = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
+	dod = ModelObject('dodecahedron.obj')
+	#pyr = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
+
 	coll = CollisionChecker() # From checker.py
 
 	pointVertex = (0.25,0.25,0)
 
-	gl.createStaticObj(pyr.vertices, pyr.edges)
+	gl.createStaticObj(dod.vertices, dod.edges)
 	gl.createHIP(pointVertex)
 
 	i = 0.01

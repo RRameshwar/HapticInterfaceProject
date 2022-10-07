@@ -21,7 +21,7 @@ class render_environment():
 
 		self.transf = [0,0,0]
 
-		self.displayCenter = [screen.get_size()[i] // 2 for i in range(2)]
+		self.displayCenter = [screen.get_size()[i] // 4 for i in range(2)]
 		self.mouseMove = [0, 0]
 		pg.mouse.set_pos(self.displayCenter)
 
