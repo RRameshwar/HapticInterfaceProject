@@ -56,6 +56,7 @@ class render_environment():
 
 	def drawStaticObj(self):
 		glBegin(GL_LINES)
+		glColor4f(1,1,1,1)
 		for edge in self.staticEdges:
 			for vertex in edge:
 				glVertex3fv(self.staticVerts[vertex])
@@ -66,9 +67,9 @@ class render_environment():
 		
 		for i in range(0, len(self.staticFaces)):
 			if i in prims:
-				glColor4f(0,1,0,0.5)
+				glColor4f(0,1,0,1)
 			else:
-				glColor4f(1,0,0,0.5)
+				glColor4f(1,0,0,1)
 			for vertex in self.staticFaces[i]:
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
@@ -141,7 +142,9 @@ class render_environment():
 			glTranslatef(*self.transf)
 			self.drawHIP()			
 			glPopMatrix()
+
 			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
+			self.drawStaticObj()
 
 			# glPopMatrix()
 
@@ -152,7 +155,7 @@ class render_environment():
 		# detectCollision(triangleVertices,newVertex)
 		
 			pg.display.flip()
-			pg.time.wait(10)
+			pg.time.wait(100)
 		return self.run
 
 

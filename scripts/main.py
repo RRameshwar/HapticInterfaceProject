@@ -14,16 +14,17 @@ import pywavefront
 
 if __name__ == '__main__':
 	gl = render_environment()
-	hip = HapticInterfacePoint()
-	dod = ModelObject('dodecahedron.obj')
-	#pyr = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
+
+	#dod = ModelObject('dodecahedron.obj')
+	dod = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
 	coll = CollisionChecker() # From checker.py
 
-	pointVertex = (2.0, 2.0 ,0)
+	pointVertex = (1.5, 1.5 , -1.5)
 
 	gl.createStaticObj(dod.vertices, dod.edges, dod.faces)
 	gl.createHIP(pointVertex)
+	hip = HapticInterfacePoint(initial_position = pointVertex)
 
 	i = 0.01
 
@@ -34,13 +35,18 @@ if __name__ == '__main__':
 		
 		is_coll, prims = coll.detectCollision(dod,hip) # returns a boolean and a list of primitives (indices of the face list)
 
+		print("Current HIP position ", hip.current_position)
+
 		if not is_coll:
-			T = [i, 1.25, 0]
+			T = [0, 0, i]
 			hip.updatePos(T) # find new position for HIP
-			gl.moveHIP([i,1.25,0])
+			gl.moveHIP(T)
 		else:
 			print("Collided!")
-			print(hip.current_position)
+			print("Current HIP Position: ", hip.current_position)
+			print("Coliding face indices: ", prims)
+
+			pg.quit()
 
 		run = gl.render(prims)
 				

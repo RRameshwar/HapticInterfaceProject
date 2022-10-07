@@ -11,10 +11,10 @@ class CollisionChecker():
 		for i in range(0, len(object.faces)):
 			face = object.faces[i]
 			triangle_vertices = []
-			for i in range(0,3): # 0-3 for pyramid (4 faces)
-				triangle_vertices.append(object.vertices[face[i]])
+			for j in range(0,3): # 0-3 for pyramid (4 faces)
+				triangle_vertices.append(object.vertices[face[j]])
 			if self.detectCollision_line_test(triangle_vertices, hip):
-				print(face)
+				print("Colliding face: ", face)
 				colliding_faces.append(i)
 				is_coll = True
 
@@ -25,8 +25,15 @@ class CollisionChecker():
 
 		## Detect collision between line segment and a face (triangle)
 		n = np.cross(np.subtract(tri[1], tri[0]), np.subtract(tri[2], tri[0]))
+		n = n/np.linalg.norm(n)
+		
 		hipPos = hip.current_position
 		godPos = hip.previous_position
+		# print("-----------")
+		# print("Triangle Vertices: ", tri)
+		# print("Current Position: ", hipPos)
+		# print("Previos Position: ", godPos)
+		# print("-----------")
 
 		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
 		d_b = np.dot(np.subtract(godPos, tri[0]), n) # Distance of god obj from plane
@@ -37,10 +44,10 @@ class CollisionChecker():
 			lineCollision = True
 
 		if lineCollision:
-			print(d_a, d_b)
+			print("Signed distances to plane: ", d_a, d_b)
 			print("\nLine Collision! Checking if point intersects a face...")
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
-			print(intersect_point)
+			print("intersection point: ", intersect_point)
 			return self.detectCollision_primitive_test_2(tri, intersect_point)
 			
 		else:
@@ -62,6 +69,7 @@ class CollisionChecker():
 			return False
 
 		print("Primitive Collision Detected!")
+
 		return True
 
 
