@@ -8,6 +8,7 @@ import numpy as np
 
 class HapticInterfacePoint():
 	def __init__(self, initial_position=[0, 0, 0]):
+		self.initial_position = initial_position
 		self.current_position = initial_position
 		self.previous_position = initial_position
 
@@ -18,12 +19,21 @@ class HapticInterfacePoint():
 
 		self.rendered_force = [0, 0, 0]
 
-	def updatePos(self, velocity, timestep):
-		newx = self.current_position[0] + velocity * timestep
-		newy = self.current_position[1] + velocity * timestep
 
+	# def updatePos(self, velocity, timestep):
+	# 	newx = self.current_position[0] + velocity * timestep
+	# 	newy = self.current_position[1] + velocity * timestep
+
+	# 	self.previous_position = self.current_position
+	# 	self.current_position = [newx, newy]
+
+	def updatePos(self, transformation):
+		newHipPos = np.add(self.initial_position, transformation)
+		
 		self.previous_position = self.current_position
-		self.current_position = [newx, newy]
+		self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
+		self.current_position = newHipPos
+
 
 	def calcPlaneFromPrim(self, prim):
 		#prim = [[x1, y1, z1], [x2, y2, z2], [x3, y3, z3]]
