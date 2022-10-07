@@ -23,7 +23,8 @@ class render_environment():
 		
 		self.viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
-		self.transf = [0,0,0]
+		self.transf = [0,0,0] # No transf at first
+		self.createOrigin()
 
 		self.displayCenter = [screen.get_size()[i] // 4 for i in range(2)]
 		self.mouseMove = [0, 0]
@@ -49,10 +50,21 @@ class render_environment():
 		self.hipSize = size
 
 
-	# def drawOrigin(self):
-	# 	glBegin()
-			
-	# 	glEnd()
+	def createOrigin(self):
+		self.originVerts = ((0,0,0),(1,0,0),(0,1,0),(0,0,1))
+		self.originEdges = ((0,1),(0,2),(0,3))
+
+
+	def drawOrigin(self):
+		glBegin(GL_LINES)
+		for edge in self.originEdges:
+			color = list(self.originVerts[edge[1]]) + [1]
+			print(color)
+			for vertex in edge:
+				glColor4f(*color)
+				glVertex3fv(self.originVerts[vertex])
+		glEnd()
+
 
 	def drawStaticObj(self):
 		glBegin(GL_LINES)
@@ -61,6 +73,7 @@ class render_environment():
 			for vertex in edge:
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
+
 
 	def drawStaticObjSolid(self,prims):
 		glBegin(GL_TRIANGLES)
@@ -145,7 +158,7 @@ class render_environment():
 
 			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
 			self.drawStaticObj()
-
+			self.drawOrigin()
 			# glPopMatrix()
 
 
