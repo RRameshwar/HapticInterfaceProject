@@ -20,9 +20,9 @@ if __name__ == '__main__':
 
 	coll = CollisionChecker() # From checker.py
 
-	pointVertex = (0.25,0.25,0)
+	pointVertex = (-2.0, -2.0 ,0)
 
-	gl.createStaticObj(dod.vertices, dod.edges)
+	gl.createStaticObj(dod.vertices, dod.edges, dod.faces)
 	gl.createHIP(pointVertex)
 
 	i = 0.01
@@ -30,14 +30,17 @@ if __name__ == '__main__':
 	run = gl.render()
 	while run == True:
 		run = gl.render()
-		coll.detectCollision(pyr,hip)
+		is_coll, prims = coll.detectCollision(dod,hip)
 		# if i < 1:
 		# 	gl.moveHIP([i,0,0])
 		# else:
 
-		T = [i, 1.25, 0]
-		hip.updatePos(T)
-		gl.moveHIP([i,1.25,0])
+		if not is_coll:
+			T = [i, 1.25, 0]
+			hip.updatePos(T)
+			gl.moveHIP([i,1.25,0])
+		else:
+			print("Collided!")
 				
 		# # #find new position for HIP
 		# # hip.updatePos(newPos) #maybe have to rewrite the update function

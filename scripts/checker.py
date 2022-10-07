@@ -35,8 +35,12 @@ class CollisionChecker():
 			lineCollision = True
 
 		if lineCollision:
-			return self.detectCollision_primitive_test(tri, hipPos)
-			print("line collision!")
+			print("lineCollision")
+			print(tri)
+			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
+			print(intersect_point)
+			return self.detectCollision_primitive_test(tri, intersect_point)
+			
 		else:
 			return False
 
@@ -50,22 +54,25 @@ class CollisionChecker():
 	    v = tri[2] - tri[0]
 	    w = p - tri[0]
 
-	    alpha = -(np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)^2 - np.dot(u,u) * np.dot(v,v))
-	    beta = -(np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)^2 - np.dot(u,u) * np.dot(v,v))
+	    #alpha = -(np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+	    #beta = -(np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+
+	    alpha = np.dot(w,v)/np.dot(u,v)
+	    beta = np.dot(w,u)/np.dot(u,v)
 
 	    # Check collision conditions as a boolean list
 	    check = [alpha>=0, beta>=0, alpha+beta<=1]
 
-	    # if alpha>= 0:
-	    #     print("alpha high")
+	    if alpha>= 0:
+	        print("alpha high")
 
-	    # if all(check):
-	    #     print("\nCollision Detected!")
-	    #     print(alpha, beta)
-	    #     print(check)
-	    # else:
-	    #     print('\nNo Detection...')
-	    #     print(alpha, beta)
-	    #     print(check)
+	    if all(check):
+	        print("\nCollision Detected!")
+	        print(alpha, beta)
+	        print(check)
+	    else:
+	        print('\nNo Detection...')
+	        print(alpha, beta)
+	        print(check)
 
 	    return all(check)

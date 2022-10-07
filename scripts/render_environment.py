@@ -17,6 +17,9 @@ class render_environment():
 
 		glMatrixMode(GL_MODELVIEW)
 		glLoadIdentity()
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		self.viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
@@ -35,9 +38,10 @@ class render_environment():
 		self.transf = transf
 
 
-	def createStaticObj(self,vertices,edges):  # Only for a wireframe display (lines + edges)
+	def createStaticObj(self,vertices,edges,faces):  # Only for a wireframe display (lines + edges)
 		self.staticVerts = vertices
 		self.staticEdges = edges
+		self.staticFaces = faces
 
 
 	def createHIP(self,vertex,size=5):
@@ -55,12 +59,21 @@ class render_environment():
 		for edge in self.staticEdges:
 			for vertex in edge:
 				glVertex3fv(self.staticVerts[vertex])
-		glEnd()	
+		glEnd()
+
+	def drawStaticObjSolid(self):
+		glBegin(GL_TRIANGLES)
+		glColor4f(1,0,0,0.5)
+		for face in self.staticFaces:
+			for vertex in face:
+				glVertex3fv(self.staticVerts[vertex])
+		glEnd()
 
 
 	def drawHIP(self):
 		glPointSize(self.hipSize)
 		glBegin(GL_POINTS)
+		glColor3f(1,1,1)
 		glVertex3f(*self.hipVert)
 		glEnd()
 
@@ -124,7 +137,7 @@ class render_environment():
 			glTranslatef(*self.transf)
 			self.drawHIP()			
 			glPopMatrix()
-			self.drawStaticObj() # Need to draw the object after push/pop 
+			self.drawStaticObjSolid() # Need to draw the object after push/pop 
 
 			# glPopMatrix()
 
