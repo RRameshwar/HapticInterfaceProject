@@ -27,7 +27,7 @@ class HapticInterfacePoint():
 	# 	self.previous_position = self.current_position
 	# 	self.current_position = [newx, newy]
 
-	def updatePos(self, transformation):
+	def updatePos(self, transformation): ## Update hip and god position | this is passed to the render function in main.py
 
 		self.previous_position = self.current_position
 

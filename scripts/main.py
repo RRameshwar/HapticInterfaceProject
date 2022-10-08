@@ -27,7 +27,8 @@ if __name__ == '__main__':
 	hip = HapticInterfacePoint(initial_position = pointVertex)
 
 	collided_faces = []
-	run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
+	# run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
+	run = gl.render(collided_faces, hip)
 	
 	while run == True:
 		T = [0, 0, 0.05]
@@ -36,10 +37,8 @@ if __name__ == '__main__':
 		if is_coll:
 			hip.has_collided = not hip.has_collided
 
-		hip.updatePos(T) # find new position for HIP
+		# hip.updatePos(T) # find new position for HIP
 
-		run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)				
-
-
-
+		# run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
+		run = gl.render(collided_faces, hip)
 
