@@ -45,7 +45,7 @@ class render_environment():
 		self.staticFaces = faces
 
 
-	def createHIP(self,vertex,size=5):
+	def createHIP(self,vertex,size=10):
 		self.hipVert = vertex
 		self.hipSize = size
 
@@ -59,7 +59,7 @@ class render_environment():
 		glBegin(GL_LINES)
 		for edge in self.originEdges:
 			color = list(self.originVerts[edge[1]]) + [1]
-			print(color)
+			#print(color)
 			for vertex in edge:
 				glColor4f(*color)
 				glVertex3fv(self.originVerts[vertex])

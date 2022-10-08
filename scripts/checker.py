@@ -6,7 +6,7 @@ class CollisionChecker():
 		pass
 
 	def detectCollision(self, object, hip):
-		print("DETECTING COLLISION SET")
+		#print("DETECTING COLLISION SET")
 		colliding_faces = []
 		is_coll = False
 		for i in range(0, len(object.faces)):
@@ -18,7 +18,7 @@ class CollisionChecker():
 				colliding_faces.append(i)
 				is_coll = True
 
-		print("FINAL RETURN: ", colliding_faces)
+		#print("FINAL RETURN: ", colliding_faces)
 		return is_coll, colliding_faces 
 
 
@@ -47,11 +47,11 @@ class CollisionChecker():
 			lineCollision = True
 
 		if lineCollision:
-			print()
-			print("Line Collision! Checking if point intersects a face...")
+			#print()
+			#print("Line Collision! Checking if point intersects a face...")
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
-			print("intersection point: ", intersect_point)
-			print()
+			#print("intersection point: ", intersect_point)
+			#print()
 			return self.detectCollision_primitive_test(tri, intersect_point)
 
 			
@@ -73,7 +73,7 @@ class CollisionChecker():
 		if np.dot(u,w) < 0:
 			return False
 
-		print("Primitive Collision Detected!")
+		#print("Primitive Collision Detected!")
 
 		return True
 
@@ -96,13 +96,13 @@ class CollisionChecker():
 	    # if alpha>= 0:
 	    #     print("alpha high")
 
-	    if all(check):
-	        print("\nPrimitive Collision Detected!")
-	        print(round(alpha,3), round(beta,3))
-	        print(check)
-	    else:
-	        print('\nNo Primitive Collision Detected...')
-	        print(round(alpha,3), round(beta,3))
-	        print(check)
+	    # if all(check):
+	    #     print("\nPrimitive Collision Detected!")
+	    #     print(round(alpha,3), round(beta,3))
+	    #     print(check)
+	    # else:
+	    #     print('\nNo Primitive Collision Detected...')
+	    #     print(round(alpha,3), round(beta,3))
+	    #     print(check)
 
 	    return all(check)
