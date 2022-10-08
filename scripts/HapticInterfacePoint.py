@@ -95,7 +95,7 @@ class HapticInterfacePoint():
 		triangle_points = (self.modelObject.vertices[triangle[0]], 
 			self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
 
-		# print("Triangle Points are ", triangle_points)
+		print("Triangle Points are ", triangle_points)
 		consts[0] = self.calcPlaneFromPrim(triangle_points)
 
 		# for i in range(0, 3):
@@ -110,7 +110,7 @@ class HapticInterfacePoint():
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		# print("plane consts, ", consts)
+		#print("plane consts, ", consts)
 
 		# A = [
 		# 	[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
@@ -126,10 +126,14 @@ class HapticInterfacePoint():
 			[0, 0, 1, consts[0][2]],
 			[consts[0][0], consts[0][1], consts[0][2], 0]]
 
-		# print(A)
+		print("A = ", A)
 		
 
-		B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][0]])
+		B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1])
+
+		print("B = ", B)
+
+		print("A -1 = ", np.linalg.inv(A))
 
 		# A = 
 		# [1  0  0  a1 a2 a3
@@ -139,9 +143,10 @@ class HapticInterfacePoint():
 		#  a2 b2 c2  0 0  0
 		#  a3 b3 c3  0 0  0 ]
 
-		x_godobj = np.dot(np.linalg.inv(A), B)
+		x_godobj = np.matmul(np.linalg.inv(A), B)
 
-		#print(x_godobj)
+		#print("HIP POSITION ", self.current_position)
+		print("GO POSITION ", x_godobj)
 
 		return [x_godobj[0], x_godobj[1], x_godobj[2]]
 

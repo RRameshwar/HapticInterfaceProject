@@ -38,12 +38,13 @@ if __name__ == '__main__':
 	collision_time = 0
 	
 	while run == True:
+		run = gl.render(collided_faces, hip)
+		#print(hip.current_position)
 		T = [0, 0, 0.05]
 		is_coll, collided_faces = coll_check.detectCollision(model,hip) # returns a boolean and a list of primitives (indices of the face list)
-		
+
 		if is_coll:
-			print(is_coll, hip.has_collided, hip.current_position, hip.previous_position)
-			if time.time() - collision_time < 0.2:
+			if time.time() - collision_time < 0.02:
 				collision_time = time.time()
 			else:
 				if hip.has_collided == False:
@@ -62,5 +63,5 @@ if __name__ == '__main__':
 			hip.active_plane = collided_faces
 
 		# run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
-		run = gl.render(collided_faces, hip)
+		
 

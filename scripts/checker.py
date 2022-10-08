@@ -38,25 +38,16 @@ class CollisionChecker():
 		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
 		d_b = np.dot(np.subtract(godPos, tri[0]), n) # Distance of god obj from plane
 
-		# print("Signed distances to plane: ", d_a, d_b)
-		# print("-----------")
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
-			lineCollision = False
+			return False
 		else:
-			lineCollision = True
-
-		if lineCollision:
 			#print()
 			#print("Line Collision! Checking if point intersects a face...")
 			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
 			#print("intersection point: ", intersect_point)
 			#print()
 			return self.detectCollision_primitive_test(tri, intersect_point)
-
-			
-		else:
-			return False
 
 
 	def detectCollision_primitive_test_2(self,tri,p):

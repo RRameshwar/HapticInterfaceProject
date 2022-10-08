@@ -163,17 +163,17 @@ class render_environment():
 
 			# apply hip movement
 			if keypress[pg.K_UP]:
-				hip.updatePos([0, 0.05, 0])
+				hip.updatePos([0, 0.03, 0])
 			if keypress[pg.K_DOWN]:
-				hip.updatePos([0, -0.05, 0])
+				hip.updatePos([0, -0.03, 0])
 			if keypress[pg.K_LEFT]:
-				hip.updatePos([-0.05, 0, 0])
+				hip.updatePos([-0.03, 0, 0])
 			if keypress[pg.K_RIGHT]:
-				hip.updatePos([0.05, 0, 0])
+				hip.updatePos([0.03, 0, 0])
 			if keypress[pg.K_RETURN]:
-				hip.updatePos([0, 0, 0.05])
+				hip.updatePos([0, 0, 0.03])
 			if keypress[pg.K_RSHIFT]:
-				hip.updatePos([0, 0, -0.05])			
+				hip.updatePos([0, 0, -0.03])			
 
 
 
