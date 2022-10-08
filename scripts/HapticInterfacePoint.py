@@ -49,8 +49,11 @@ class HapticInterfacePoint():
 		x2 = prim[1][0]; y2 = prim[1][1]; z2 = prim[1][2]
 		x3 = prim[2][0]; y3 = prim[2][1]; z3 = prim[2][2]
 
-		edge1 = [x2-x1, y2-y1, z2-z1]
-		edge2 = [x3-x1, y3-y1, z3-z1]
+		# edge1 = [x2-x1, y2-y1, z2-z1]
+		# edge2 = [x3-x1, y3-y1, z3-z1]
+
+		edge1 = [np.subtract(x2,x1), np.subtract(y2,y1), np.subtract(z2,z1)]
+		edge2 = [np.subtract(x3,x1), np.subtract(y3,y1), np.subtract(z3,z1)]
 
 		#print(edge1, edge2)
 
@@ -87,7 +90,7 @@ class HapticInterfacePoint():
 		#print("prim_list ", prim_list)
 
 		triangle = self.modelObject.faces[prim_list[0]]
-		print("Triangle ", 0, " is ", triangle)
+		print("Triangle ", prim_list[0], " is ", triangle)
 		
 		triangle_points = (self.modelObject.vertices[triangle[0]], 
 			self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
@@ -121,7 +124,7 @@ class HapticInterfacePoint():
 			[1, 0, 0, consts[0][0]],
 			[0, 1, 0, consts[0][1]],
 			[0, 0, 1, consts[0][2]],
-			[consts[0][0], consts[0][1], consts[0][2], 1]]
+			[consts[0][0], consts[0][1], consts[0][2], 0]]
 
 		# print(A)
 		

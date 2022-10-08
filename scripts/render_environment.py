@@ -12,7 +12,8 @@ class render_environment():
 		pg.init()
 		screen = pg.display.set_mode(self.display, DOUBLEBUF|OPENGL)
 		glMatrixMode(GL_PROJECTION)
-		gluPerspective(70, (self.display[0]/self.display[1]), 0.5, 50.0)
+		gluPerspective(45, (self.display[0]/self.display[1]), 0.5, 50.0)
+		#glOrtho(0, 1000, 750, 0, -1, 1)
 		
 		glRotatef(90, 0, 0, 0)
 		glTranslatef(0.0, 0.0, -5)

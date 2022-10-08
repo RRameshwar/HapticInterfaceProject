@@ -16,8 +16,9 @@ if __name__ == '__main__':
 	gl = render_environment()
 
 	model = ModelObject('dodecahedron.obj')
+	
+	#model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 	print(model.faces)
-	# dod = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
 	coll_check = CollisionChecker() # From checker.py
 
@@ -37,6 +38,7 @@ if __name__ == '__main__':
 		
 		if is_coll:
 			hip.has_collided = not hip.has_collided
+			print("TOGGLING COLLISION ", hip.has_collided)
 
 		if is_coll and hip.has_collided:
 			print("UPDATED ACTIVE PLANE ", collided_faces)
