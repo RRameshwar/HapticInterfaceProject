@@ -4,6 +4,8 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+from HapticInterfacePoint import *
+
 class render_environment():
 	def __init__(self):
 		self.display = (1680, 1050)
@@ -12,7 +14,7 @@ class render_environment():
 		glMatrixMode(GL_PROJECTION)
 		gluPerspective(70, (self.display[0]/self.display[1]), 0.5, 50.0)
 		
-		glRotatef(90, 0, 0, 1)
+		glRotatef(90, 0, 0, 0)
 		glTranslatef(0.0, 0.0, -5)
 
 		glMatrixMode(GL_MODELVIEW)
@@ -25,6 +27,10 @@ class render_environment():
 
 		self.transf = [0,0,0] # No transf at first
 		self.createOrigin()
+
+		# self.hip = hip
+
+		# self.hip = HapticInterfacePoint(initial_position = (0.2, 0.2 ,-2.0))
 
 		self.displayCenter = [screen.get_size()[i] // 4 for i in range(2)]
 		self.mouseMove = [0, 0]
@@ -59,7 +65,6 @@ class render_environment():
 		glBegin(GL_LINES)
 		for edge in self.originEdges:
 			color = list(self.originVerts[edge[1]]) + [1]
-			#print(color)
 			for vertex in edge:
 				glColor4f(*color)
 				glVertex3fv(self.originVerts[vertex])
@@ -103,16 +108,16 @@ class render_environment():
 		glEnd()
 
 
-	def render(self, prims, hip_position, god_position):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
+	def userInput(self, hip):
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
 				self.run = False
 			if event.type == pg.KEYDOWN:
-				if event.key == pg.K_ESCAPE or event.key == pg.K_RETURN:
+				if event.key == pg.K_ESCAPE:
 					self.run = False
 				if event.key == pg.K_PAUSE or event.key == pg.K_p:
 					self.paused = not self.paused
-					pg.mouse.set_pos(self.displayCenter) 
+					pg.mouse.set_pos(self.displayCenter)
 			if self.paused==False: 
 				if event.type == pg.MOUSEMOTION:
 					self.mouseMove = [event.pos[i] - self.displayCenter[i] for i in range(2)]
@@ -134,7 +139,7 @@ class render_environment():
 			glPushMatrix()
 			glLoadIdentity()
 
-			# apply the movment 
+			# apply camera movment  
 			if keypress[pg.K_w]:
 				glTranslatef(0,0,0.1)
 			if keypress[pg.K_s]:
@@ -155,12 +160,31 @@ class render_environment():
 			glPopMatrix()
 			glMultMatrixf(self.viewMatrix)
 
+			# apply hip movement
+			if keypress[pg.K_UP]:
+				hip.updatePos([0, 0.05, 0])
+			if keypress[pg.K_DOWN]:
+				hip.updatePos([0, -0.05, 0])
+			if keypress[pg.K_LEFT]:
+				hip.updatePos([-0.05, 0, 0])
+			if keypress[pg.K_RIGHT]:
+				hip.updatePos([0.05, 0, 0])
+			if keypress[pg.K_RETURN]:
+				hip.updatePos([0, 0, 0.05])
+			if keypress[pg.K_RSHIFT]:
+				hip.updatePos([0, 0, -0.05])			
+
+
+
+	def render(self, prims, hip): # hip_position, god_position):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
+		self.userInput(hip)
+		if self.paused == False:	
 			glMatrixMode(GL_MODELVIEW)
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
 
-			self.drawHIP(hip_position)			
+			self.drawHIP(hip.current_position)			
 
-			self.drawGodObject(god_position)
+			self.drawGodObject(hip.god_object_pos)
 
 			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
 			self.drawStaticObj()
@@ -174,7 +198,7 @@ class render_environment():
 		# detectCollision(triangleVertices,newVertex)
 		
 			pg.display.flip()
-			pg.time.wait(100)
+			pg.time.wait(10)
 		return self.run
 
 
