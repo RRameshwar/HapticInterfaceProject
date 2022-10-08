@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
 	coll_check = CollisionChecker() # From checker.py
 
-	pointVertex = (1.5, 1.0, 0.0)
+	pointVertex = (0.5, 2.0, 0.5)
 
 	gl.createStaticObj(model.vertices, model.edges, model.faces)
 	gl.createHIP(pointVertex)
