@@ -7,7 +7,7 @@ from OpenGL.GLU import *
 import numpy as np
 
 class HapticInterfacePoint():
-	def __init__(self, initial_position=[0, 0, 0]):
+	def __init__(self, modelObject, initial_position=[0, 0, 0]):
 		self.initial_position = initial_position
 		self.current_position = initial_position
 		self.previous_position = initial_position
@@ -15,9 +15,11 @@ class HapticInterfacePoint():
 		self.has_collided = False
 		self.god_object_pos = [0, 0, 0]
 
-		self.entry_point = []
+		self.active_plane = []
 
 		self.rendered_force = [0, 0, 0]
+
+		self.modelObject = modelObject
 
 
 	# def updatePos(self, velocity, timestep):
@@ -34,8 +36,11 @@ class HapticInterfacePoint():
 		self.current_position = np.add(self.current_position, transformation)
 				
 		if not self.has_collided:
+			print("default pos")
 			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
-
+		if self.has_collided:
+			print("calculated pos")
+			self.god_object_pos = self.calculateGodObject(self.active_plane)
 
 
 	def calcPlaneFromPrim(self, prim):
@@ -79,17 +84,30 @@ class HapticInterfacePoint():
 
 		consts = np.zeros([3,4])
 
-		for i in range(0, 3):
-			try: 
-				consts[i] = self.calcPlaneFromPrim(prim_list[i])
-			except:
-				pass
+		#print("prim_list ", prim_list)
+
+		triangle = self.modelObject.faces[prim_list[0]]
+		print("Triangle ", 0, " is ", triangle)
+		
+		triangle_points = (self.modelObject.vertices[triangle[0]], 
+			self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
+
+		# print("Triangle Points are ", triangle_points)
+		consts[0] = self.calcPlaneFromPrim(triangle_points)
+
+		# for i in range(0, 3):
+		# 	try:
+		# 		triangle = self.model.faces[prim_list[i]] 
+		# 		print("Triangle ", i, " is ", triangle)
+		# 		consts[i] = self.calcPlaneFromPrim(triangle)
+		# 	except:
+		# 		pass
 		
 		# consts = [a1 b1 c1 d1
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		print(consts)
+		# print("plane consts, ", consts)
 
 		# A = [
 		# 	[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
@@ -105,7 +123,7 @@ class HapticInterfacePoint():
 			[0, 0, 1, consts[0][2]],
 			[consts[0][0], consts[0][1], consts[0][2], 1]]
 
-		print(A)
+		# print(A)
 		
 
 		B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][0]])
@@ -122,7 +140,7 @@ class HapticInterfacePoint():
 
 		print(x_godobj)
 
-		self.god_object_pos = [x_godobj[0], x_godobj[1], x_godobj[2]]
+		return [x_godobj[0], x_godobj[1], x_godobj[2]]
 
 	def calculateForce():
 		k = [17, 17, 17]
@@ -130,23 +148,5 @@ class HapticInterfacePoint():
 		for i in range(0, 3):
 			self.rendered_force[i] = [k[i]*(self.god_object_pos[i] - self.current_position[i])]
 
-
-def main():
-	hip = HapticInterfacePoint(initial_position = [2, 2, 2])
-
-	triangleVertices = ((0,0,0),(10,0,0),(0,10,0))
-
-	triangleVertices = [list(tup) for tup in triangleVertices]
-
-	hip.calculateGodObject([triangleVertices])
-
-	print(hip.god_object_pos)
-
-
-
-if __name__ == '__main__':
-	main()
-
-	
 
 
