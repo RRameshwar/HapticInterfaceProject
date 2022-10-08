@@ -90,7 +90,7 @@ class HapticInterfacePoint():
 		#print("prim_list ", prim_list)
 
 		triangle = self.modelObject.faces[prim_list[0]]
-		print("Triangle ", prim_list[0], " is ", triangle)
+		#print("Triangle ", prim_list[0], " is ", triangle)
 		
 		triangle_points = (self.modelObject.vertices[triangle[0]], 
 			self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
@@ -141,7 +141,7 @@ class HapticInterfacePoint():
 
 		x_godobj = np.dot(np.linalg.inv(A), B)
 
-		print(x_godobj)
+		#print(x_godobj)
 
 		return [x_godobj[0], x_godobj[1], x_godobj[2]]
 

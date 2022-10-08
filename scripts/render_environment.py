@@ -8,7 +8,7 @@ from HapticInterfacePoint import *
 
 class render_environment():
 	def __init__(self):
-		self.display = (1680, 1050)
+		self.display = (1000, 700)
 		pg.init()
 		screen = pg.display.set_mode(self.display, DOUBLEBUF|OPENGL)
 		glMatrixMode(GL_PROJECTION)
@@ -74,7 +74,7 @@ class render_environment():
 
 	def drawStaticObj(self):
 		glBegin(GL_LINES)
-		glColor4f(1,1,1,1)
+		glColor4f(0,0,0,1)
 		for edge in self.staticEdges:
 			for vertex in edge:
 				glVertex3fv(self.staticVerts[vertex])
