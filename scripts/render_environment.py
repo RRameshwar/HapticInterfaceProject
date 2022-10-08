@@ -183,12 +183,12 @@ class render_environment():
 			glMatrixMode(GL_MODELVIEW)
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
 
+			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
+			self.drawStaticObj()
+
 			self.drawHIP(hip.current_position)			
 
 			self.drawGodObject(hip.god_object_pos)
-
-			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
-			self.drawStaticObj()
 			self.drawOrigin()
 			# glPopMatrix()
 

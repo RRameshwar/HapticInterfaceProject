@@ -65,7 +65,7 @@ class HapticInterfacePoint():
 		b = cross_product[1]
 		c = cross_product[2]
 
-		d = a*-1*x1 + b*-1*x2 + c*-1*x3
+		d = -1 * (a * x1 + b * y1 + c * z1)
 
 		return a, b, c, d
 
@@ -110,7 +110,7 @@ class HapticInterfacePoint():
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		#print("plane consts, ", consts)
+		print("plane consts, ", consts)
 
 		# A = [
 		# 	[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
@@ -143,7 +143,7 @@ class HapticInterfacePoint():
 		#  a2 b2 c2  0 0  0
 		#  a3 b3 c3  0 0  0 ]
 
-		x_godobj = np.matmul(np.linalg.inv(A), B)
+		x_godobj = np.dot(np.linalg.inv(A), B)
 
 		#print("HIP POSITION ", self.current_position)
 		print("GO POSITION ", x_godobj)
