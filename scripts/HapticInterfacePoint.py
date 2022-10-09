@@ -26,7 +26,7 @@ class HapticInterfacePoint():
 		self.modelObject = modelObject
 		self.modelObject_faces = [list(tup) for tup in self.modelObject.faces]
 
-		self.coll_check = CollisionChecker()
+		self.coll_check = CollisionChecker(self.modelObject)
 
 
 	# def updatePos(self, velocity, timestep):
@@ -43,27 +43,27 @@ class HapticInterfacePoint():
 		self.current_position = np.add(self.current_position, transformation)
 				
 		if not self.has_collided:
-			print("default pos")
+			# print("default pos")
 			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
 		if self.has_collided:
-			print("WE COLLIDED!!!!")
-			print("calculated pos")
+			self.god_object_pos = self.calculateGodObject(self.active_planes)
+			# print("WE COLLIDED!!!!")
+			# print("calculated pos")
 			self.updatePlaneConstraints()
 
 	
 	def updatePossiblePlanes(self):
-		faces = self.modelObject_faces
 		self.possible_planes = []
-		print("List of active planes ", self.active_planes)
+		# print("List of active planes ", self.active_planes)
 
 		for active_plane in self.active_planes:
 			active_plane_points = self.modelObject_faces[active_plane]
 			print("Current active plane ", active_plane_points)
-			for face in faces:
+			for face in self.modelObject_faces:
 				print("Current face ", face)
 				if (any(item in face for item in active_plane_points)):
 					self.possible_planes.append(face)
-					print("Added to possible planes")
+					# print("Added to possible planes")
 
 
 	def updatePlaneConstraints(self):
@@ -79,6 +79,8 @@ class HapticInterfacePoint():
 		is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos, True) # Collision check based on old god object position
 		
 		print("NEW CONSTRAINTS ", new_constraints)
+		if new_constraints == []:
+			print("\nNEW CONSTRAINTS IS EMPTY WTF\n")
 		
 		self.god_object_pos = self.calculateGodObject(new_constraints)
 
@@ -90,19 +92,6 @@ class HapticInterfacePoint():
 		self.active_planes = new_constraints
 		self.updatePossiblePlanes()			
 
-		#reset old constraints
-			# check list of possible planes for intersection (using checker)
-					# checker between hip.current_pos and hip.god_object_pos
-				# whichever planes pass checker are active, add to new_constraints
-				# calculate a new god object position
-
-			#while len(old_constraints) != len(new_constraints)
-				# check list of possible planes for intersection (using checker)
-					# checker between hip.current_pos and hip.god_object_pos
-				# whichever planes pass checker are active
-				# calculate a new god object position
-			
-			# update possible plane list based on the active plane
 
 	def calcPlaneFromPrim(self, prim):
 		#prim = [[x1, y1, z1], [x2, y2, z2], [x3, y3, z3]]
@@ -156,7 +145,7 @@ class HapticInterfacePoint():
 		triangle_points = (self.modelObject.vertices[triangle[0]], 
 			self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
 
-		print("Triangle Points are ", triangle_points)
+		# print("Triangle Points are ", triangle_points)
 		consts[0] = self.calcPlaneFromPrim(triangle_points)
 
 		# for i in range(0, 3):
@@ -171,7 +160,7 @@ class HapticInterfacePoint():
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		print("plane consts, ", consts)
+		# print("plane consts, ", consts)
 
 		# A = [
 		# 	[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
@@ -187,14 +176,14 @@ class HapticInterfacePoint():
 			[0, 0, 1, consts[0][2]],
 			[consts[0][0], consts[0][1], consts[0][2], 0]]
 
-		print("A = ", A)
+		# print("A = ", A)
 		
 
 		B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1])
 
-		print("B = ", B)
+		# print("B = ", B)
 
-		print("A -1 = ", np.linalg.inv(A))
+		# print("A -1 = ", np.linalg.inv(A))
 
 		# A = 
 		# [1  0  0  a1 a2 a3
@@ -207,9 +196,9 @@ class HapticInterfacePoint():
 		x_godobj = np.dot(np.linalg.inv(A), B)
 
 		#print("HIP POSITION ", self.current_position)
-		print("GO POSITION ", x_godobj)
+		# print("GO POSITION ", x_godobj)
 
-		return [x_godobj[0], x_godobj[1], x_godobj[2]]
+		return np.array([x_godobj[0], x_godobj[1], x_godobj[2]])
 
 	def calculateForce():
 		k = [17, 17, 17]

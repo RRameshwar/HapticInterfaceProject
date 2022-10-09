@@ -16,15 +16,14 @@ import time
 if __name__ == '__main__':
 	gl = render_environment()
 
-	#model = ModelObject('dodecahedron.obj')
+	model = ModelObject('dodecahedron.obj')
 
-	model = Cube()
+	# model = Cube()
 	
 	#model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
-	print(model.faces)
 
-	coll_check = CollisionChecker() # From checker.py
+	coll_check = CollisionChecker(model) # From checker.py
 
 	pointVertex = (0.5, 2.35, 0.5)
 
@@ -50,12 +49,13 @@ if __name__ == '__main__':
 				if hip.has_collided == False:
 					hip.has_collided = True
 					collision_time = time.time()
-					print("TOGGLING COLLISION ", hip.has_collided)
+					# print("TOGGLING COLLISION ", hip.has_collided)
+					hip.god_object_pos = hip.current_position
 				else:
 					hip.has_collided = False
 					collision_time = 0
 					hip.active_planes = []
-					print("TOGGLING COLLISION ", hip.has_collided)
+					# print("TOGGLING COLLISION ", hip.has_collided)
 	
 
 		if is_coll and hip.has_collided:
