@@ -33,6 +33,7 @@ class CollisionChecker():
 		## Detect collision between line segment and a face (triangle)
 		n = np.cross(np.subtract(tri[1], tri[0]), np.subtract(tri[2], tri[0]))
 		n = n/np.linalg.norm(n)
+		print("Plane Normal: ", n)
 		
 		hipPos = hip_position
 		test_point = test_position

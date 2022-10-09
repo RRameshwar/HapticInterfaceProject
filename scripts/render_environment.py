@@ -16,7 +16,7 @@ class render_environment():
 		#glOrtho(0, 1000, 750, 0, -1, 1)
 		
 		glRotatef(90, 0, 0, 0)
-		glTranslatef(0.0, 0.0, -5)
+		glTranslatef(0.0, 0.0, -10)
 
 		glMatrixMode(GL_MODELVIEW)
 		glLoadIdentity()
@@ -73,7 +73,7 @@ class render_environment():
 		glEnd()
 
 
-	def drawStaticObj(self):
+	def drawWire(self):
 		glBegin(GL_LINES)
 		glColor4f(0,0,0,1)
 		for edge in self.staticEdges:
@@ -87,9 +87,9 @@ class render_environment():
 		
 		for i in range(0, len(self.staticFaces)):
 			if i in prims:
-				glColor4f(0,1,0,0.3)
+				glColor4f(0,1,0,1)
 			else:
-				glColor4f(1,0,0,0.3)
+				glColor4f(1,0,0,1)
 			for vertex in self.staticFaces[i]:
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
@@ -192,7 +192,7 @@ class render_environment():
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
 
 			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
-			self.drawStaticObj()
+			self.drawWire()
 
 			self.drawHIP(hip.current_position)			
 
