@@ -58,7 +58,7 @@ class CollisionChecker():
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			if d_b == 0:
-				print("Line Collision! Checking if point intersects a face...")
+				# print("Line Collision! Checking if point intersects a face...")
 				intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 				tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point)
 				# print("RESULT OF PRIM TEST:", tempPrimTest)
@@ -66,7 +66,7 @@ class CollisionChecker():
 			return False
 		else:
 			#print()
-			print("Line Collision! Checking if point intersects a face...")
+			# print("Line Collision! Checking if point intersects a face...")
 			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 			#print("intersection point: ", intersect_point)
 			tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point)

@@ -39,17 +39,21 @@ class HapticInterfacePoint():
 	def updatePos(self, transformation): ## Update hip and god position | this is passed to the render function in main.py
 
 		self.previous_position = self.current_position
-
-		self.current_position = np.add(self.current_position, transformation)
+		
 				
 		if not self.has_collided:
 			print("NOPE")
 			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
 		if self.has_collided:
-			self.god_object_pos = self.calculateGodObject(self.active_planes)
 			print("WE COLLIDED!!!!")
+			self.god_object_pos = self.calculateGodObject(self.active_planes)
 			# print("calculated pos")
 			self.updatePlaneConstraints()
+
+
+		self.current_position = np.add(self.current_position, transformation)
+
+
 
 	
 	def updatePossiblePlanes(self):
@@ -64,7 +68,6 @@ class HapticInterfacePoint():
 				if (any(item in face for item in active_plane_points)):
 					if not face in self.possible_planes:
 						self.possible_planes.append(face)
-					# print("Added to possible planes")
 
 
 	def updatePlaneConstraints(self):
@@ -149,28 +152,33 @@ class HapticInterfacePoint():
 
 		#print("prim_list ", prim_list)
 
-		triangle = self.modelObject.faces[prim_list[0]]
-		#print("Triangle ", prim_list[0], " is ", triangle)
+		# triangle = self.modelObject.faces[prim_list[0]]
+		# #print("Triangle ", prim_list[0], " is ", triangle)
 		
-		triangle_points = (self.modelObject.vertices[triangle[0]], 
-			self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
+		# triangle_points = (self.modelObject.vertices[triangle[0]], 
+		# 	self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]])
 
 		# print("Triangle Points are ", triangle_points)
-		consts[0] = self.calcPlaneFromPrim(triangle_points)
+		# consts[0] = self.calcPlaneFromPrim(triangle_points)
 
-		# for i in range(0, 3):
-		# 	try:
-		# 		triangle = self.model.faces[prim_list[i]] 
-		# 		print("Triangle ", i, " is ", triangle)
-		# 		consts[i] = self.calcPlaneFromPrim(triangle)
-		# 	except:
-		# 		pass
+		for i in range(0, 3):
+			try:
+				print("TRYING SOME SHIT")
+				triangle = self.modelObject.faces[prim_list[i]]
+				print("Triangle ", i, " is ", triangle)
+				triangle_points = (self.modelObject.vertices[triangle[0]], 
+					self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]]) 
+				
+				consts[i] = self.calcPlaneFromPrim(triangle_points)
+			except:
+				pass
 		
 		# consts = [a1 b1 c1 d1
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		# print("plane consts, ", consts)
+		print("len prim ", len(prim_list))
+		print("plane consts, ", consts)
 
 		# A = [
 		# 	[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
@@ -180,16 +188,41 @@ class HapticInterfacePoint():
 		# 	[consts[1][0], consts[1][1], consts[1][2], 0, 0, 0],
 		# 	[consts[2][0], consts[2][1], consts[2][2], 0, 0, 0]]
 
-		A = [
-			[1, 0, 0, consts[0][0]],
-			[0, 1, 0, consts[0][1]],
-			[0, 0, 1, consts[0][2]],
-			[consts[0][0], consts[0][1], consts[0][2], 0]]
+		if len(prim_list) == 1:
+			A = [
+				[1, 0, 0, consts[0][0]],
+				[0, 1, 0, consts[0][1]],
+				[0, 0, 1, consts[0][2]],
+				[consts[0][0], consts[0][1], consts[0][2], 0]]
 
-		# print("A = ", A)
+			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1])
+
+			print("A = ", A)
+
+		if len(prim_list) == 2:
+			A = [
+				[1, 0, 0, consts[0][0], consts[1][0]],
+				[0, 1, 0, consts[0][1], consts[1][1]],
+				[0, 0, 1, consts[0][2], consts[1][2]],
+				[consts[0][0], consts[0][1], consts[0][2], 0, 0],
+				[consts[1][0], consts[1][1], consts[1][2], 0, 0]
+				]
+
+			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1])
 		
+		if len(prim_list) == 3:
+			A = [
+				[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
+				[0, 1, 0, consts[0][1], consts[1][1], consts[2][1]],
+				[0, 0, 1, consts[0][2], consts[1][2], consts[2][2]],
+				[consts[0][0], consts[0][1], consts[0][2], 0, 0, 0],
+				[consts[1][0], consts[1][1], consts[1][2], 0, 0, 0],
+				[consts[2][0], consts[2][1], consts[2][2], 0, 0, 0]]
 
-		B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1])
+			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1, consts[2][3]*-1])
+
+
+		
 
 		# print("B = ", B)
 

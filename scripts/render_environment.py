@@ -40,6 +40,7 @@ class render_environment():
 		self.up_down_angle = 0.0
 		self.paused = False
 		self.run = True
+		self.transformation = [0, 0, 0]
 
 
 	def moveHIP(self,transf):
@@ -163,22 +164,29 @@ class render_environment():
 
 			# apply hip movement
 			if keypress[pg.K_UP]:
-				hip.updatePos([0, 0.03, 0])
+				return [0, 0.03, 0]
+				# hip.updatePos([0, 0.03, 0])
 			if keypress[pg.K_DOWN]:
-				hip.updatePos([0, -0.03, 0])
+				return [0, -0.03, 0]
+				# hip.updatePos([0, -0.03, 0])
 			if keypress[pg.K_LEFT]:
-				hip.updatePos([-0.03, 0, 0])
+				return [-0.03, 0, 0]
+				# hip.updatePos([-0.03, 0, 0])
 			if keypress[pg.K_RIGHT]:
-				hip.updatePos([0.03, 0, 0])
+				return [0.03, 0, 0]
+				# hip.updatePos([0.03, 0, 0])
 			if keypress[pg.K_RETURN]:
-				hip.updatePos([0, 0, 0.03])
+				return [0, 0, 0.03]
+				# hip.updatePos([0, 0, 0.03])
 			if keypress[pg.K_RSHIFT]:
-				hip.updatePos([0, 0, -0.03])			
+				return [0, 0, -0.03]
+				# hip.updatePos([0, 0, -0.03])
+		return [0, 0, 0]			
 
 
 
 	def render(self, prims, hip): # hip_position, god_position):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
-		self.userInput(hip)
+		
 		if self.paused == False:	
 			glMatrixMode(GL_MODELVIEW)
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
