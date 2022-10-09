@@ -93,7 +93,7 @@ class HapticInterfacePoint():
 
 		while not (old_constraints == new_constraints):
 			count = count + 1
-			# print("CHECKING GO AGAIN ", count, new_constraints)
+			print("CHECKING GO AGAIN ", count, new_constraints)
 			old_constraints = new_constraints
 			is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos, True) # Collision check based on old god object position
 			self.god_object_pos = self.calculateGodObject(new_constraints)
@@ -185,7 +185,7 @@ class HapticInterfacePoint():
 
 			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1])
 		
-		if len(prim_list) == 3:
+		if len(prim_list) >= 3:
 			A = [
 				[1, 0, 0, consts[0][0], consts[1][0], consts[2][0]],
 				[0, 1, 0, consts[0][1], consts[1][1], consts[2][1]],

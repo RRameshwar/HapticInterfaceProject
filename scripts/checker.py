@@ -33,7 +33,7 @@ class CollisionChecker():
 		## Detect collision between line segment and a face (triangle)
 		n = np.cross(np.subtract(tri[1], tri[0]), np.subtract(tri[2], tri[0]))
 		n = n/np.linalg.norm(n)
-		print("Plane Normal: ", n)
+		print("\n LINE COLLISION CHECK BEGIN")
 		
 		hipPos = hip_position
 		test_point = test_position
@@ -58,11 +58,11 @@ class CollisionChecker():
 		print("TEST POS ", test_point)
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
-			if d_b == 0:
+			if abs(d_b) < 0.0001:
 				# print("Line Collision! Checking if point intersects a face...")
 				intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 				tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point)
-				# print("RESULT OF PRIM TEST:", tempPrimTest)
+				print("RESULT OF PRIM TEST:", tempPrimTest)
 				return tempPrimTest
 			return False
 		else:
@@ -71,7 +71,7 @@ class CollisionChecker():
 			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 			#print("intersection point: ", intersect_point)
 			tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point)
-			# print("RESULT OF PRIM TEST:", tempPrimTest)
+			print("RESULT OF PRIM TEST:", tempPrimTest)
 			return tempPrimTest
 
 
@@ -112,13 +112,13 @@ class CollisionChecker():
 	    # if alpha>= 0:
 	    #     print("alpha high")
 
-	    # if all(check):
-	    #     print("\nPrimitive Collision Detected!")
-	    #     print(round(alpha,3), round(beta,3))
-	    #     print(check)
-	    # else:
-	    #     print('\nNo Primitive Collision Detected...')
-	    #     print(round(alpha,3), round(beta,3))
-	    #     print(check)
+	    if all(check):
+	        print("\nPrimitive Collision Detected!")
+	        print(round(alpha,3), round(beta,3))
+	        print(check)
+	    else:
+	        print('\nNo Primitive Collision Detected...')
+	        print(round(alpha,3), round(beta,3))
+	        print(check)
 
 	    return all(check)

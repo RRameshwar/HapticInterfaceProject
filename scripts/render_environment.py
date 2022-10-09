@@ -89,7 +89,7 @@ class render_environment():
 			if i in prims:
 				glColor4f(0,1,0,1)
 			else:
-				glColor4f(1,0,0,1)
+				glColor4f(i/12,0,0,1)
 			for vertex in self.staticFaces[i]:
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
@@ -164,22 +164,22 @@ class render_environment():
 
 			# apply hip movement
 			if keypress[pg.K_UP]:
-				return [0, 0.03, 0]
+				return [0, 0.05, 0]
 				# hip.updatePos([0, 0.03, 0])
 			if keypress[pg.K_DOWN]:
-				return [0, -0.03, 0]
+				return [0, -0.05, 0]
 				# hip.updatePos([0, -0.03, 0])
 			if keypress[pg.K_LEFT]:
-				return [-0.03, 0, 0]
+				return [-0.05, 0, 0]
 				# hip.updatePos([-0.03, 0, 0])
 			if keypress[pg.K_RIGHT]:
-				return [0.03, 0, 0]
+				return [0.05, 0, 0]
 				# hip.updatePos([0.03, 0, 0])
 			if keypress[pg.K_RETURN]:
-				return [0, 0, 0.03]
+				return [0, 0, 0.05]
 				# hip.updatePos([0, 0, 0.03])
 			if keypress[pg.K_RSHIFT]:
-				return [0, 0, -0.03]
+				return [0, 0, -0.05]
 				# hip.updatePos([0, 0, -0.03])
 		return [0, 0, 0]			
 
