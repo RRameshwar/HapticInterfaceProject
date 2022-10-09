@@ -50,11 +50,11 @@ class CollisionChecker():
 		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
 		d_b = np.dot(np.subtract(test_point, tri[0]), n) # Distance of god obj from plane
 
-		# print("PLANE TO CHECK ", tri)
-		# print("DA ", d_a)
-		# print("DB ", d_b)
-		# print("HIP POS ", hipPos)
-		# print("TEST POS ", test_point)
+		print("PLANE TO CHECK ", tri)
+		print("DA ", d_a)
+		print("DB ", d_b)
+		print("HIP POS ", hipPos)
+		print("TEST POS ", test_point)
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			if d_b == 0:

@@ -43,11 +43,11 @@ class HapticInterfacePoint():
 		self.current_position = np.add(self.current_position, transformation)
 				
 		if not self.has_collided:
-			# print("default pos")
+			print("NOPE")
 			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
 		if self.has_collided:
 			self.god_object_pos = self.calculateGodObject(self.active_planes)
-			# print("WE COLLIDED!!!!")
+			print("WE COLLIDED!!!!")
 			# print("calculated pos")
 			self.updatePlaneConstraints()
 
@@ -58,16 +58,18 @@ class HapticInterfacePoint():
 
 		for active_plane in self.active_planes:
 			active_plane_points = self.modelObject_faces[active_plane]
-			print("Current active plane ", active_plane_points)
+			print("Current active plane ", active_plane, active_plane_points, [self.modelObject.vertices[active_plane_points[0]], self.modelObject.vertices[active_plane_points[1]], self.modelObject.vertices[active_plane_points[2]]])
 			for face in self.modelObject_faces:
-				print("Current face ", face)
+				# print("Current face ", face)
 				if (any(item in face for item in active_plane_points)):
-					self.possible_planes.append(face)
+					if not face in self.possible_planes:
+						self.possible_planes.append(face)
 					# print("Added to possible planes")
 
 
 	def updatePlaneConstraints(self):
-
+		print()
+		print("PLANE CONSTRAINT FIRST UPDATE")
 		self.updatePossiblePlanes()
 
 		old_constraints = []
@@ -84,12 +86,20 @@ class HapticInterfacePoint():
 		
 		self.god_object_pos = self.calculateGodObject(new_constraints)
 
+		count = 1
+		print("FIRST GO CALC IS DONE ")
+
 		while not (old_constraints == new_constraints):
+			count = count + 1
+			print("CHECKING GO AGAIN ", count, new_constraints)
 			old_constraints = new_constraints
 			is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos, True) # Collision check based on old god object position
 			self.god_object_pos = self.calculateGodObject(new_constraints)
 
+
 		self.active_planes = new_constraints
+		print()
+		print("PLANE CONSTRAINT FINAL UPDATE")
 		self.updatePossiblePlanes()			
 
 
