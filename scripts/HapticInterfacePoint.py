@@ -4,6 +4,8 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+from checker import *
+
 import numpy as np
 
 class HapticInterfacePoint():
@@ -13,13 +15,18 @@ class HapticInterfacePoint():
 		self.previous_position = initial_position
 
 		self.has_collided = False
-		self.god_object_pos = [0, 0, 0]
+		self.god_object_pos = initial_position
 
-		self.active_plane = []
+		self.active_planes = []
+
+		self.possible_planes = []
 
 		self.rendered_force = [0, 0, 0]
 
 		self.modelObject = modelObject
+		self.modelObject_faces = [list(tup) for tup in self.modelObject.faces]
+
+		self.coll_check = CollisionChecker()
 
 
 	# def updatePos(self, velocity, timestep):
@@ -39,9 +46,63 @@ class HapticInterfacePoint():
 			print("default pos")
 			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
 		if self.has_collided:
+			print("WE COLLIDED!!!!")
 			print("calculated pos")
-			self.god_object_pos = self.calculateGodObject(self.active_plane)
+			self.updatePlaneConstraints()
 
+	
+	def updatePossiblePlanes(self):
+		faces = self.modelObject_faces
+		self.possible_planes = []
+		print("List of active planes ", self.active_planes)
+
+		for active_plane in self.active_planes:
+			active_plane_points = self.modelObject_faces[active_plane]
+			print("Current active plane ", active_plane_points)
+			for face in faces:
+				print("Current face ", face)
+				if (any(item in face for item in active_plane_points)):
+					self.possible_planes.append(face)
+					print("Added to possible planes")
+
+
+	def updatePlaneConstraints(self):
+
+		self.updatePossiblePlanes()
+
+		old_constraints = []
+		new_constraints = []
+
+		print("PLANES TO CHECK: ", self.possible_planes)
+		print("LINE SEGMENT POINTS", self.current_position, self.god_object_pos)
+
+		is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos, True) # Collision check based on old god object position
+		
+		print("NEW CONSTRAINTS ", new_constraints)
+		
+		self.god_object_pos = self.calculateGodObject(new_constraints)
+
+		while not (old_constraints == new_constraints):
+			old_constraints = new_constraints
+			is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos, True) # Collision check based on old god object position
+			self.god_object_pos = self.calculateGodObject(new_constraints)
+
+		self.active_planes = new_constraints
+		self.updatePossiblePlanes()			
+
+		#reset old constraints
+			# check list of possible planes for intersection (using checker)
+					# checker between hip.current_pos and hip.god_object_pos
+				# whichever planes pass checker are active, add to new_constraints
+				# calculate a new god object position
+
+			#while len(old_constraints) != len(new_constraints)
+				# check list of possible planes for intersection (using checker)
+					# checker between hip.current_pos and hip.god_object_pos
+				# whichever planes pass checker are active
+				# calculate a new god object position
+			
+			# update possible plane list based on the active plane
 
 	def calcPlaneFromPrim(self, prim):
 		#prim = [[x1, y1, z1], [x2, y2, z2], [x3, y3, z3]]

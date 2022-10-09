@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
 	coll_check = CollisionChecker() # From checker.py
 
-	pointVertex = (0.5, 2.0, 0.5)
+	pointVertex = (0.5, 2.35, 0.5)
 
 	gl.createStaticObj(model.vertices, model.edges, model.faces)
 	gl.createHIP(pointVertex)
@@ -40,8 +40,8 @@ if __name__ == '__main__':
 	while run == True:
 		run = gl.render(collided_faces, hip)
 		#print(hip.current_position)
-		T = [0, 0, 0.05]
-		is_coll, collided_faces = coll_check.detectCollision(model,hip) # returns a boolean and a list of primitives (indices of the face list)
+
+		is_coll, collided_faces = coll_check.detectCollision(model, model.faces,hip.current_position,hip.previous_position, False) # returns a boolean and a list of primitives (indices of the face list)
 
 		if is_coll:
 			if time.time() - collision_time < 0.02:
@@ -54,13 +54,14 @@ if __name__ == '__main__':
 				else:
 					hip.has_collided = False
 					collision_time = 0
+					hip.active_planes = []
 					print("TOGGLING COLLISION ", hip.has_collided)
 	
 
 		if is_coll and hip.has_collided:
 			#print("UPDATED ACTIVE PLANE ", collided_faces)
 			#print("Current hip pos ", hip.current_position)
-			hip.active_plane = collided_faces
+			hip.active_planes = collided_faces
 
 		# run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
 		

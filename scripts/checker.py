@@ -5,16 +5,16 @@ class CollisionChecker():
 	def __init():
 		pass
 
-	def detectCollision(self, object, hip):
-		#print("DETECTING COLLISION SET")
+	def detectCollision(self, object, object_faces, hip_position, test_position, is_god):
+		
 		colliding_faces = []
 		is_coll = False
-		for i in range(0, len(object.faces)):
-			face = object.faces[i]
+		for i in range(0, len(object_faces)):
+			face = object_faces[i]
 			triangle_vertices = []
 			for j in range(0,len(face)): # 0-3 for pyramid (4 faces)
 				triangle_vertices.append(object.vertices[face[j]])
-			if self.detectCollision_line_test(triangle_vertices, hip):
+			if self.detectCollision_line_test(triangle_vertices, hip_position, test_position, is_god):
 				colliding_faces.append(i)
 				is_coll = True
 
@@ -22,29 +22,41 @@ class CollisionChecker():
 		return is_coll, colliding_faces 
 
 
-	def detectCollision_line_test(self, tri, hip):
+	def detectCollision_line_test(self, tri, hip_position, test_position, is_god):
 
 		## Detect collision between line segment and a face (triangle)
 		n = np.cross(np.subtract(tri[1], tri[0]), np.subtract(tri[2], tri[0]))
 		n = n/np.linalg.norm(n)
 		
-		hipPos = hip.current_position
-		godPos = hip.previous_position
+		hipPos = hip_position
+
+		#test_point = test_position
+		
+		# if is_god:
+		# 	test_point = test_position + 0.05*n
+		# else:
+		# 	test_point = test_position
+
 		# print("-----------")
 		# print("Triangle Vertices: ", tri)
 		# print("Current Position: ", hipPos)
 		# print("Previos Position: ", godPos)
 
 		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
-		d_b = np.dot(np.subtract(godPos, tri[0]), n) # Distance of god obj from plane
+		d_b = np.dot(np.subtract(test_point, tri[0]), n) # Distance of god obj from plane
 
+		print("PLANE TO CHECK ", tri)
+		print("DA ", d_a)
+		print("DB ", d_b)
+		print("HIP POS ", hipPos)
+		print("TEST POS ", test_point)
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			return False
 		else:
 			#print()
 			#print("Line Collision! Checking if point intersects a face...")
-			intersect_point = (d_a*godPos - d_b*hipPos)/(d_a - d_b)
+			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 			#print("intersection point: ", intersect_point)
 			#print()
 			return self.detectCollision_primitive_test(tri, intersect_point)
