@@ -37,8 +37,6 @@ class CollisionChecker():
 		
 		hipPos = hip_position
 		test_point = test_position
-
-
 		
 		if is_god:
 			print("Test position without fudge ", test_position)
@@ -63,8 +61,6 @@ class CollisionChecker():
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			if abs(d_b) < 0.0001:
-				if is_god:
-					return True
 				# print("Line Collision! Checking if point intersects a face...")
 				intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 				tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point)
@@ -72,8 +68,6 @@ class CollisionChecker():
 				return tempPrimTest
 			return False
 		else:
-			if is_god:
-				return True
 			#print()
 			# print("Line Collision! Checking if point intersects a face...")
 			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
