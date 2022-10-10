@@ -31,15 +31,19 @@ class CollisionChecker():
 	def detectCollision_line_test(self, tri, hip_position, test_position, is_god):
 
 		## Detect collision between line segment and a face (triangle)
-		n = np.cross(np.subtract(tri[1], tri[0]), np.subtract(tri[2], tri[0]))
+		n = np.cross(np.subtract(tri[0], tri[1]), np.subtract(tri[1], tri[2]))
 		n = n/np.linalg.norm(n)
 		print("\n LINE COLLISION CHECK BEGIN")
 		
 		hipPos = hip_position
 		test_point = test_position
+
+
 		
 		if is_god:
-			test_point = test_position + 0.05*n
+			print("Test position without fudge ", test_position)
+			print("FUDGE ", n)
+			test_point = test_position - 0.02*n
 		else:
 			test_point = test_position
 
@@ -59,6 +63,8 @@ class CollisionChecker():
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
 			if abs(d_b) < 0.0001:
+				if is_god:
+					return True
 				# print("Line Collision! Checking if point intersects a face...")
 				intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 				tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point)
@@ -66,6 +72,8 @@ class CollisionChecker():
 				return tempPrimTest
 			return False
 		else:
+			if is_god:
+				return True
 			#print()
 			# print("Line Collision! Checking if point intersects a face...")
 			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
