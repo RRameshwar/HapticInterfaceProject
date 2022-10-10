@@ -29,10 +29,9 @@ if __name__ == '__main__':
 	
 	# model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
-
 	coll_check = CollisionChecker(model) # From checker.py
 
-	pointVertex = (0.5, 2.35, 2)
+	pointVertex = (0.5, 2.35, 1)
 
 	gl.createStaticObj(model.vertices, model.edges, model.faces)
 	gl.createHIP(pointVertex)
