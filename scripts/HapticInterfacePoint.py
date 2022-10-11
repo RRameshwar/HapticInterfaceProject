@@ -15,51 +15,34 @@ class HapticInterfacePoint():
 		self.current_position = initial_position
 		self.previous_position = initial_position
 
-		self.has_collided = False
+		self.inside_object = False
 		self.god_object_pos = initial_position
 		self.god_object_pos_prev = initial_position
 
 		self.active_planes = []
-
 		self.possible_planes = []
-
 		self.rendered_force = [0, 0, 0]
 
 		self.modelObject = modelObject
 		self.modelObject_faces = [list(tup) for tup in self.modelObject.faces]
 
-		self.coll_check = CollisionChecker(self.modelObject)
+		self.checker = CollisionChecker(self.modelObject)
 
-
-	# def updatePos(self, velocity, timestep):
-	# 	newx = self.current_position[0] + velocity * timestep
-	# 	newy = self.current_position[1] + velocity * timestep
-
-	# 	self.previous_position = self.current_position
-	# 	self.current_position = [newx, newy]
-
-	def updatePos(self, transformation): ## Update hip and god position | this is passed to the render function in main.py
+	## This function should move the HIP and (if colliding) the God object positions
+	def updatePos(self, transformation):
 
 		self.previous_position = self.current_position
 		
-				
-		if not self.has_collided:
-			# print("NOPE")
-			self.god_object_pos_prev = self.god_object_pos
-			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
-			self.current_position = np.add(self.current_position, transformation)
-		if self.has_collided:
+		if self.inside_object:
 			# print("WE COLLIDED!!!!")
-			# self.god_object_pos_prev = self.god_object_pos
-			# self.god_object_pos = self.calculateGodObject(self.active_planes)
-			# print("calculated pos")
-			# print("UPDATING PLANE CONSTRAINTS HERE COMES THE FUDGE")
-			#self.god_object_pos = self.current_position
+			## If inside object, let's update our plane constraints recursively
 			self.updatePlaneConstraints()
-			self.current_position = np.add(self.current_position, transformation)
-			
+		else:
+			## If NOT inside object, let's just update our previous positions
+			self.god_object_pos_prev = self.god_object_pos
+			self.god_object_pos = self.current_position
 
-
+		self.current_position = np.add(self.current_position, transformation)				
 		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_object_pos_prev, " GOD NOW ", self.god_object_pos, " ACTIVE PLANES ", self.active_planes)
 		
 	
@@ -89,7 +72,7 @@ class HapticInterfacePoint():
 		# print("PLANES TO CHECK: ", self.possible_planes)
 		# print("LINE SEGMENT POINTS", self.current_position, self.god_object_pos)
 
-		is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
+		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
 
 		# print("NEW CONSTRAINTS ", new_constraints)
 		# if new_constraints == []:
@@ -103,7 +86,7 @@ class HapticInterfacePoint():
 			count = count + 1
 			# print("CHECKING GO AGAIN ", count, new_constraints)
 			old_constraints = new_constraints
-			is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
+			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
 
 			god_obj_pos_temp = self.calculateGodObject(new_constraints)
 
@@ -210,7 +193,7 @@ class HapticInterfacePoint():
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		print("OG prim list ", len(prim_list), prim_list)
+		print("OG prim list (len, list)", len(prim_list), prim_list)
 
 
 			
@@ -260,8 +243,6 @@ class HapticInterfacePoint():
 			#B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1, consts[2][3]*-1])
 			B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1, consts[1][3]*-1, consts[2][3]*-1])
 
-
-		
 
 		# print("B = ", B)
 

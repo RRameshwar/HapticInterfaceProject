@@ -32,7 +32,7 @@ if __name__ == '__main__':
 	# model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
 
-	coll_check = CollisionChecker(model) # From checker.py
+	checker = CollisionChecker(model) # From checker.py
 
 	#pointVertex = (0.5, 2.35, 2)
 	pointVertex = (2, 1.3, 6.0)
@@ -41,55 +41,43 @@ if __name__ == '__main__':
 	gl.createHIP(pointVertex)
 	hip = HapticInterfacePoint(model, initial_position = pointVertex)
 
-	collided_faces = []
-	# run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
-	run = gl.render(collided_faces, hip)
+	# run = gl.render(collided_faces, hip)
+
+	run = True
 	collision_time = 0
+	collided_faces = []
 
 	is_coll = False
 	
 	while run == True:
 		
-		#print(hip.current_position)
-		
+		# Get user input (arrow keys)
 		transformation = gl.userInput(hip)
 		
-		# print("\nCHECKING FOR COLLISION WITH OBJECT!!\n")
-		
-		# print(hip.god_object_pos)
+		# Creating "toggle" whether we are inside object or not
 		if is_coll:
-			# print("HAS COLLIDED ", hip.has_collided)
-			# if time.time() - collision_time < 0.02:
-			# 	collision_time = time.time()
-			# else:
-			if hip.has_collided == False:
-				hip.has_collided = True
-				collision_time = time.time()
-				# print("TOGGLING COLLISION ", hip.has_collided)
-				# hip.god_object_pos = hip.current_position
-			else:
-				hip.has_collided = False
-				collision_time = 0
+									# print("HAS COLLIDED ", hip.has_collided)
+									# if time.time() - collision_time < 0.02:
+									# 	collision_time = time.time()
+									# else:
+			## If colliding for the second time, we are NOT IN THE OBJECT
+			if hip.inside_object == True:
+				hip.inside_object = False
 				hip.active_planes = []
-				# hip.god_object_pos = hip.current_position
-				# print("TOGGLING COLLISION ", hip.has_collided)
-
-		if is_coll and hip.has_collided:
-			#print("UPDATED ACTIVE PLANE ", collided_faces)
-			#print("Current hip pos ", hip.current_position)
-			hip.active_planes = collided_faces
+				# collision_time = 0
+			## If colliding for first time, we are IN THE OBJECT
+			else:
+				hip.inside_object = True
+				hip.active_planes = collided_faces
+				# collision_time = time.time()
 
 		hip.updatePos(transformation)
 
-		is_coll, collided_faces = coll_check.detectCollision(model, model.faces,hip.current_position,hip.previous_position, False) # returns a boolean and a list of primitives (indices of the face list)
+		is_coll, collided_faces = checker.detectCollision(model.faces, hip.current_position, hip.previous_position, False) # returns a boolean and a list of primitives (indices of the face list)
 		# print("COLLISION WITH OBJECT RETURNED ", is_coll, hip.current_position, hip.previous_position, hip.god_object_pos)
 
 		
 
 		run = gl.render(collided_faces, hip)
-
-
-
-		# run = gl.render(collided_faces, hip.current_position, hip.god_object_pos)
 		
 

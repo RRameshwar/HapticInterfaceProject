@@ -6,89 +6,71 @@ class CollisionChecker():
 		self.modelObject = object
 		self.modelObjectFaces = [list(tup) for tup in self.modelObject.faces]
 		self.modelObjectVertices = [list(tup) for tup in self.modelObject.vertices]
-		# pass
+		self.intersect_point = [0, 0, 0]
 
-	def detectCollision(self, object, object_faces, hip_position, test_position, is_god):
+	## This function should perform line-plane test, then if True, perform point-triangle test
+	## Two types of checks: collision with object and updating plain constraints
+	def detectCollision(self, test_faces, hip_position, test_position, constraint_test=False):
 		
+		collision = False
 		colliding_faces = []
-		is_coll = False
 		
-		for i in range(0, len(object_faces)): # Loop through possible neighboring faces
-			face = list(object_faces[i])
+		# Check each face
+		for face in test_faces:
+			face = list(face) # These are the indices corresponding to vertices
 			triangle_vertices = []
 			
-			for j in range(0,len(face)): # Loop through each point in the face (3 points in triangle)
-				triangle_vertices.append(self.modelObjectVertices[face[j]])
+			## Assign test face's vertices to list 
+			triangle_vertices.append(self.modelObjectVertices[face[0]])
+			triangle_vertices.append(self.modelObjectVertices[face[1]])
+			triangle_vertices.append(self.modelObjectVertices[face[2]])
 			
-			if is_god:
-				print("\nPLANE TO CHECK ", self.modelObjectFaces.index(face), "IS GOD = ", is_god)
+			if constraint_test:
+				print("\nCHECKING PLANE", self.modelObjectFaces.index(face), "IS GOD TEST?", constraint_test)
 			
-			if self.detectCollision_line_test(triangle_vertices, hip_position, test_position, is_god): # Run line test and point test
-				colliding_faces.append(self.modelObjectFaces.index(face))
-				is_coll = True
+			## Perform line test, if passes, perform primitive test. If both pass, return the face that passed
+			if self.line_test(triangle_vertices, hip_position, test_position, constraint_test):
+				print("\nLINE TEST PASSED!! Performing prim test...")
+				if self.primitive_test(triangle_vertices, self.intersect_point, constraint_test):
+					print("PRIM TEST PASSED!! Returning the collided faces...\n")
+					colliding_faces.append(self.modelObjectFaces.index(face))
+					collision = True
 
-		#print("FINAL RETURN: ", colliding_faces)
-		# print("finished checking all faces, these are colliding: ", colliding_faces)
-		return is_coll, colliding_faces 
+		return collision, colliding_faces 
 
 
-	def detectCollision_line_test(self, tri, hip_position, test_position, is_god):
+	## Perform line test between line segment and a plane
+	def line_test(self, tri, hipPos, testPos, constraint_test):
 
 		## Detect collision between line segment and a face (triangle)
-		n = np.cross(np.subtract(tri[0], tri[1]), np.subtract(tri[1], tri[2]))
+		n = np.cross(np.subtract(tri[0], tri[1]), np.subtract(tri[1], tri[2])) # Get face normal vector
 		n = n/np.linalg.norm(n)
-		# print("LINE COLLISION CHECK BEGIN")
 		
-		hipPos = hip_position
-		test_point = test_position
-		
-		if is_god:
-			# print("Test position without fudge ", test_position)
-			# print("FUDGE ", n)
-			# print("Hip position to test against ", hipPos)
-			test_point = test_position - 0.02*n
-		else:
-			test_point = test_position
+		## If performing a constraint update check, add a fudge factor normal to the face we are checking
+		if constraint_test:
+			testPos = testPos - 0.02*n
 
-		# print("-----------")
-		#print("Triangle Vertices: ", tri)
-		# print("Current Position: ", hipPos)
-		# print("Previos Position: ", godPos)
+		## Calculate distance of hip and god from the plane
+		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
+		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3)
+	
+		if constraint_test:
+			print("HIP TO PLANE", hip_dist_to_plane, "TEST TO PLANE", test_dist_to_plane)
+			print("HIP POS", hipPos, "TEST POS", testPos)
 
-		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
-		d_b = np.dot(np.subtract(test_point, tri[0]), n) # Distance of god obj from plane
-
-
-		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
-			if abs(d_b) < 0.001:
-				# print("Line Collision! Checking if point intersects a face...", is_god)
-
-				if is_god:
-					print("DA ", d_a)
-					print("DB ", d_b)
-					print("HIP POS ", hipPos)
-					print("TEST POS ", test_point)
-
-				intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
-				tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point, is_god)
-				print("RESULT OF PRIM TEST:", tempPrimTest)
-				return tempPrimTest
+		## If both distances are on the same side of the plane (same sign), LINE TEST FAILS
+		if abs(hip_dist_to_plane + test_dist_to_plane) == abs(hip_dist_to_plane) + abs(test_dist_to_plane):
 			return False
+			## Check if negligible distance to plane (when we are constrained)
+			# if abs(test_dist_to_plane) < 0.001:
+			# 	# print("Line Collision! Checking if point intersects a face...", constraint_test)
+			# 	self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
+			# 	return True
 		else:
-			#print()
-			# print("Line Collision! Checking if point intersects a face...", is_god)
-
-			if is_god:
-				print("DA ", d_a)
-				print("DB ", d_b)
-				print("HIP POS ", hipPos)
-				print("TEST POS ", test_point)
-
-			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
-			#print("intersection point: ", intersect_point)
-			tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point, is_god)
-			print("RESULT OF PRIM TEST:", tempPrimTest)
-			return tempPrimTest
+			# print("Line Collision! Checking if point intersects a face...", constraint_test)
+			## Calculate the point that falls on the plane
+			self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
+			return True
 
 
 	def detectCollision_primitive_test_2(self,tri,p):
@@ -110,7 +92,7 @@ class CollisionChecker():
 		return True
 
 
-	def detectCollision_primitive_test(self, tri, p, is_god):
+	def primitive_test(self, tri, p, constraint_test):
 		## Detect collision between a point and a triangle
 		tri = np.array(tri)
 		p = np.array(p)
@@ -124,22 +106,10 @@ class CollisionChecker():
 		beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 
 		# Check collision conditions as a boolean list
-		if is_god:
+		if constraint_test:
 			check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
 
 		else:
 			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
-
-		# if alpha>= 0:
-		#     print("alpha high")
-
-		# if all(check):
-		# 	# print("\nPrimitive Collision Detected!")
-		# 	print(round(alpha,3), round(beta,3), alpha+beta)
-		# 	print(check)
-		# else:
-		# 	# print('\nNo Primitive Collision Detected...')
-		# 	print(round(alpha,3), round(beta,3), alpha+beta)
-		# 	print(check)
 
 		return all(check)

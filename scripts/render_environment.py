@@ -43,10 +43,6 @@ class render_environment():
 		self.transformation = [0, 0, 0]
 
 
-	def moveHIP(self,transf):
-		self.transf = transf
-
-
 	def createStaticObj(self,vertices,edges,faces):  # Only for a wireframe display (lines + edges)
 		self.staticVerts = vertices
 		self.staticEdges = edges
@@ -82,9 +78,8 @@ class render_environment():
 		glEnd()
 
 
-	def drawStaticObjSolid(self,prims):
+	def drawObject(self,prims):
 		glBegin(GL_TRIANGLES)
-		
 		for i in range(0, len(self.staticFaces)):
 			if i in prims:
 				glColor4f(0,1,0,1)
@@ -102,7 +97,7 @@ class render_environment():
 		glVertex3f(*position)
 		glEnd()
 
-	def drawGodObject(self, position):
+	def drawGod(self, position):
 		glPointSize(self.hipSize)
 		glBegin(GL_POINTS)
 		glColor3f(0,1,1)
@@ -154,7 +149,7 @@ class render_environment():
 			# apply the left and right rotation
 			glRotatef(self.mouseMove[0]*0.1, 0.0, 1.0, 0.0)
 
-			# multiply the current matrix by the get the new view matrix and store the final vie matrix 
+			# multiply the current matrix by the get the new view matrix and store the final view matrix 
 			glMultMatrixf(self.viewMatrix)
 			self.viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
@@ -185,26 +180,17 @@ class render_environment():
 
 
 
-	def render(self, prims, hip): # hip_position, god_position):  ## Run this inside a loop in the top-level file. Can use move() to move the object inside that loop.
+	def render(self, prims, hip):  ## Run this inside a loop in the top-level file.
 		
 		if self.paused == False:	
 			glMatrixMode(GL_MODELVIEW)
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)  # This must go before we draw our objects
 
-			self.drawStaticObjSolid(prims) # Need to draw the object after push/pop 
+			self.drawObject(prims) 
 			self.drawWire()
-
 			self.drawHIP(hip.current_position)			
-
-			self.drawGodObject(hip.god_object_pos)
+			self.drawGod(hip.god_object_pos)
 			self.drawOrigin()
-			# glPopMatrix()
-
-
-
-		# newVertex = pointVertex + np.array(transMat)
-		# print(newVertex)
-		# detectCollision(triangleVertices,newVertex)
 		
 			pg.display.flip()
 			pg.time.wait(10)
