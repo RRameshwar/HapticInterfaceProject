@@ -6,7 +6,6 @@ class CollisionChecker():
 		self.modelObject = object
 		self.modelObjectFaces = [list(tup) for tup in self.modelObject.faces]
 		self.modelObjectVertices = [list(tup) for tup in self.modelObject.vertices]
-		self.intersect_point = 0
 		# pass
 
 	def detectCollision(self, object, object_faces, hip_position, test_position, is_god):
@@ -21,53 +20,76 @@ class CollisionChecker():
 			for j in range(0,len(face)): # Loop through each point in the face (3 points in triangle)
 				triangle_vertices.append(self.modelObjectVertices[face[j]])
 			
-			if self.line_test(triangle_vertices, hip_position, test_position, is_god): # Run line test and point test
-				if self.primitive_test(triangle_vertices, self.intersect_point):
-					colliding_faces.append(self.modelObjectFaces.index(face))
-					is_coll = True
+			if is_god:
+				print("\nPLANE TO CHECK ", self.modelObjectFaces.index(face), "IS GOD = ", is_god)
+			
+			if self.detectCollision_line_test(triangle_vertices, hip_position, test_position, is_god): # Run line test and point test
+				colliding_faces.append(self.modelObjectFaces.index(face))
+				is_coll = True
 
 		#print("FINAL RETURN: ", colliding_faces)
+		# print("finished checking all faces, these are colliding: ", colliding_faces)
 		return is_coll, colliding_faces 
 
 
-	def line_test(self, tri, hip_position, test_position, is_god):
+	def detectCollision_line_test(self, tri, hip_position, test_position, is_god):
 
 		## Detect collision between line segment and a face (triangle)
 		n = np.cross(np.subtract(tri[0], tri[1]), np.subtract(tri[1], tri[2]))
 		n = n/np.linalg.norm(n)
-		print("\n LINE COLLISION CHECK BEGIN")
-		print("n: ", n)
+		# print("LINE COLLISION CHECK BEGIN")
 		
-		hipPos = np.array([hip_position])
-		test_point = np.array([test_position])
+		hipPos = hip_position
+		test_point = test_position
 		
 		if is_god:
-			print("Test position without fudge ", test_position)
-			test_point = test_position - 0.02*n   ## ************** SWAP FUDGE FACTOR DEPENDING ON THE NORMAL DIRECTION **********
-			print("Test position with fudge ", test_point)
+			# print("Test position without fudge ", test_position)
+			# print("FUDGE ", n)
+			# print("Hip position to test against ", hipPos)
+			test_point = test_position - 0.02*n
+		else:
+			test_point = test_position
 
 		# print("-----------")
-		# print("Triangle Vertices: ", tri)
+		#print("Triangle Vertices: ", tri)
 		# print("Current Position: ", hipPos)
 		# print("Previos Position: ", godPos)
 
 		d_a = np.dot(np.subtract(hipPos, tri[0]), n) # Distance of hip from plane
 		d_b = np.dot(np.subtract(test_point, tri[0]), n) # Distance of god obj from plane
 
-		print("PLANE TO CHECK ", tri, type(tri))
-		print("DA ", d_a, type(d_a))
-		print("DB ", d_b, type(d_b))
-		print("HIP POS ", hipPos, type(hipPos))
-		print("TEST POS ", test_point, type(test_point))
-
-		self.intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
 
 		if abs(d_a + d_b) == abs(d_a) + abs(d_b): ## If both distances are on the same side of the plane (same sign)
-			if abs(d_b) < 0.0001:
-				return True
+			if abs(d_b) < 0.001:
+				# print("Line Collision! Checking if point intersects a face...", is_god)
+
+				if is_god:
+					print("DA ", d_a)
+					print("DB ", d_b)
+					print("HIP POS ", hipPos)
+					print("TEST POS ", test_point)
+
+				intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
+				tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point, is_god)
+				print("RESULT OF PRIM TEST:", tempPrimTest)
+				return tempPrimTest
 			return False
 		else:
-			return True
+			#print()
+			# print("Line Collision! Checking if point intersects a face...", is_god)
+
+			if is_god:
+				print("DA ", d_a)
+				print("DB ", d_b)
+				print("HIP POS ", hipPos)
+				print("TEST POS ", test_point)
+
+			intersect_point = (d_a*test_point - d_b*hipPos)/(d_a - d_b)
+			#print("intersection point: ", intersect_point)
+			tempPrimTest = self.detectCollision_primitive_test(tri, intersect_point, is_god)
+			print("RESULT OF PRIM TEST:", tempPrimTest)
+			return tempPrimTest
+
 
 	def detectCollision_primitive_test_2(self,tri,p):
 		tri_translated = []
@@ -88,50 +110,36 @@ class CollisionChecker():
 		return True
 
 
-## Creating helper function for new primitive test
-	def detectCollision_same_side(self, p1, p2, a, b):
-		# cp1 = np.cross(np.subtract(b,a), np.subtract(p1,a))
-		# cp2 = np.cross(np.subtract(b,a), np.subtract(p2,a))
-		# if np.dot(cp1, cp2) >= 0:
-		if True:
-			return True
-		else:
-			return False
-
-	def detectCollision_primitive_test2(self, tri, p):
+	def detectCollision_primitive_test(self, tri, p, is_god):
+		## Detect collision between a point and a triangle
 		tri = np.array(tri)
 		p = np.array(p)
 
-		if self.detectCollision_same_side(p,tri[0],tri[1],tri[2]) and self.detectCollision_same_side(p,tri[1],tri[0],tri[2]) and self.detectCollision_same_side(p,tri[2],tri[0],tri[1]):
-			return True
+		
+		u = np.subtract(tri[1], tri[0])
+		v = np.subtract(tri[2], tri[0])
+		w = np.subtract(p, tri[0])
+
+		alpha = (np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+		beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
+
+		# Check collision conditions as a boolean list
+		if is_god:
+			check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
+
 		else:
-			return False
+			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
 
+		# if alpha>= 0:
+		#     print("alpha high")
 
-	def primitive_test(self, tri, p):
-	    ## Detect collision between a point and a triangle
-	    tri = np.array(tri)
-	    p = np.array(p)
+		# if all(check):
+		# 	# print("\nPrimitive Collision Detected!")
+		# 	print(round(alpha,3), round(beta,3), alpha+beta)
+		# 	print(check)
+		# else:
+		# 	# print('\nNo Primitive Collision Detected...')
+		# 	print(round(alpha,3), round(beta,3), alpha+beta)
+		# 	print(check)
 
-	    u = np.subtract(tri[1], tri[0])
-	    v = np.subtract(tri[2], tri[0])
-	    w = np.subtract(p, tri[0])
-
-	    alpha = (np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
-	    beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
-
-	    # Check collision conditions as a boolean list
-	    check = [alpha>=0, beta>=0, alpha+beta<=1]
-
-	    if all(check):
-	        print("\nPrimitive Collision Detected!")
-	        # print(round(alpha,3), round(beta,3))
-	        print("Alpha and Beta: ", alpha, beta)
-	        print(check)
-	    else:
-	        print('\nNo Primitive Collision Detected...')
-	        # print(round(alpha,3), round(beta,3))
-	        print("Alpha and Beta: ", alpha, beta)
-	        print(check)
-
-	    return all(check)
+		return all(check)

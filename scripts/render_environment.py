@@ -16,7 +16,7 @@ class render_environment():
 		#glOrtho(0, 1000, 750, 0, -1, 1)
 		
 		glRotatef(90, 0, 0, 0)
-		glTranslatef(0.0, 0.0, -10)
+		glTranslatef(0.0, 0.0, -20)
 
 		glMatrixMode(GL_MODELVIEW)
 		glLoadIdentity()
@@ -164,22 +164,22 @@ class render_environment():
 
 			# apply hip movement
 			if keypress[pg.K_UP]:
-				return [0, 0.03, 0]
+				return [0, 0.055, 0]
 				# hip.updatePos([0, 0.03, 0])
 			if keypress[pg.K_DOWN]:
-				return [0, -0.03, 0]
+				return [0, -0.055, 0]
 				# hip.updatePos([0, -0.03, 0])
 			if keypress[pg.K_LEFT]:
-				return [-0.03, 0, 0]
+				return [-0.055, 0, 0]
 				# hip.updatePos([-0.03, 0, 0])
 			if keypress[pg.K_RIGHT]:
-				return [0.03, 0, 0]
+				return [0.055, 0, 0]
 				# hip.updatePos([0.03, 0, 0])
 			if keypress[pg.K_RETURN]:
-				return [0, 0, 0.03]
+				return [0, 0, 0.055]
 				# hip.updatePos([0, 0, 0.03])
 			if keypress[pg.K_RSHIFT]:
-				return [0, 0, -0.03]
+				return [0, 0, -0.055]
 				# hip.updatePos([0, 0, -0.03])
 		return [0, 0, 0]			
 

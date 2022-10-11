@@ -7,6 +7,7 @@ from OpenGL.GLU import *
 from checker import *
 
 import numpy as np
+from myObject import *
 
 class HapticInterfacePoint():
 	def __init__(self, modelObject, initial_position=[0, 0, 0]):
@@ -44,28 +45,31 @@ class HapticInterfacePoint():
 				
 		if not self.has_collided:
 			# print("NOPE")
+			self.god_object_pos_prev = self.god_object_pos
 			self.god_object_pos = self.current_position ## *************** IF NO COLLISION (ASSUMED FOR NOW Friday 12:35pm) ********************
+			self.current_position = np.add(self.current_position, transformation)
 		if self.has_collided:
 			# print("WE COLLIDED!!!!")
-			self.god_object_pos_prev = self.god_object_pos
-			self.god_object_pos = self.calculateGodObject(self.active_planes)
+			# self.god_object_pos_prev = self.god_object_pos
+			# self.god_object_pos = self.calculateGodObject(self.active_planes)
 			# print("calculated pos")
-			print("UPDATING PLANE CONSTRAINTS HERE COMES THE FUDGE")
+			# print("UPDATING PLANE CONSTRAINTS HERE COMES THE FUDGE")
+			#self.god_object_pos = self.current_position
 			self.updatePlaneConstraints()
+			self.current_position = np.add(self.current_position, transformation)
+			
 
 
-		self.current_position = np.add(self.current_position, transformation)
-
-
-
+		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_object_pos_prev, " GOD NOW ", self.god_object_pos, " ACTIVE PLANES ", self.active_planes)
+		
 	
 	def updatePossiblePlanes(self):
 		self.possible_planes = []
-		print("\nList of active planes ", self.active_planes)
+		# print("\nList of active planes ", self.active_planes)
 
 		for active_plane in self.active_planes:
 			active_plane_points = self.modelObject_faces[active_plane]
-			print("Current active plane ", active_plane, active_plane_points, [self.modelObject.vertices[active_plane_points[0]], self.modelObject.vertices[active_plane_points[1]], self.modelObject.vertices[active_plane_points[2]]])
+			# print("Current active plane ", active_plane, active_plane_points, [self.modelObject.vertices[active_plane_points[0]], self.modelObject.vertices[active_plane_points[1]], self.modelObject.vertices[active_plane_points[2]]])
 			for face in self.modelObject_faces:
 				# print("Current face ", face)
 				if (any(item in face for item in active_plane_points)):
@@ -74,7 +78,7 @@ class HapticInterfacePoint():
 
 
 	def updatePlaneConstraints(self):
-		print("PLANE CONSTRAINT FIRST UPDATE")
+		# print("PLANE CONSTRAINT FIRST UPDATE")
 		self.updatePossiblePlanes()
 
 		old_constraints = []
@@ -82,33 +86,39 @@ class HapticInterfacePoint():
 
 		god_obj_pos_temp = self.god_object_pos
 
-		print("PLANES TO CHECK: ", self.possible_planes)
+		# print("PLANES TO CHECK: ", self.possible_planes)
 		# print("LINE SEGMENT POINTS", self.current_position, self.god_object_pos)
 
 		is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
-		
+
 		# print("NEW CONSTRAINTS ", new_constraints)
-		if new_constraints == []:
-			print("\nNEW CONSTRAINTS IS EMPTY WTF\n")
+		# if new_constraints == []:
+			# print("\nNEW CONSTRAINTS IS EMPTY WTF\n")
 		
-		god_obj_pos_temp = self.calculateGodObject(new_constraints)
 
 		count = 1
 		# print("FIRST GO CALC IS DONE ")
 
 		while not (old_constraints == new_constraints):
 			count = count + 1
-			print("CHECKING GO AGAIN ", count, new_constraints)
+			# print("CHECKING GO AGAIN ", count, new_constraints)
 			old_constraints = new_constraints
 			is_coll, new_constraints = self.coll_check.detectCollision(self.modelObject, self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
+
 			god_obj_pos_temp = self.calculateGodObject(new_constraints)
 
+		# print("TEMP GOD OBJECT AFTER UPDATING PLANE CONSTRAINTS IS ", god_obj_pos_temp)
 
-		self.active_planes = new_constraints
-		self.god_object_pos = god_obj_pos_temp
-		# print()
-		# print("PLANE CONSTRAINT FINAL UPDATE")
-		self.updatePossiblePlanes()			
+		self.god_object_pos_prev = self.god_object_pos
+		
+
+		if len(new_constraints) > 4:
+			self.active_planes = self.active_planes
+			print("TRUNCED ACTIVE PLANES")
+		else:
+			self.active_planes = new_constraints
+
+		self.god_object_pos = self.calculateGodObject(self.active_planes)
 
 
 	def calcPlaneFromPrim(self, prim):
@@ -139,8 +149,8 @@ class HapticInterfacePoint():
 
 
 	def isCoplanar(self, tri1, tri2):
-		print(tri1)
-		print(tri2)
+		# print(tri1)
+		# print(tri2)
 		cross1 = np.cross(np.subtract(self.modelObject.vertices[tri1[0]], self.modelObject.vertices[tri1[1]]), np.subtract(self.modelObject.vertices[tri1[1]], self.modelObject.vertices[tri1[2]]))
 		cross2 = np.cross(np.subtract(self.modelObject.vertices[tri2[0]], self.modelObject.vertices[tri2[1]]), np.subtract(self.modelObject.vertices[tri2[1]], self.modelObject.vertices[tri2[2]]))
 
@@ -155,27 +165,13 @@ class HapticInterfacePoint():
 	def calculateGodObject(self, prim_list):
 
 		consts = np.zeros([3,4])
+		prim_list_trimmed = []
 
-		for i in range(0, 3):
-			try:
-				# print("TRYING SOME SHIT")
-				triangle = self.modelObject.faces[prim_list[i]]
-				# print("Triangle ", i, " is ", triangle)
-				triangle_points = (self.modelObject.vertices[triangle[0]], 
-					self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]]) 
-				
-				consts[i] = self.calcPlaneFromPrim(triangle_points)
-			except:
-				pass
-		
-		# consts = [a1 b1 c1 d1
-		#           a2 b2 c2 d2
-		#           a3 b3 c3 d3]
-
-		print("len prim ", len(prim_list), prim_list)
+		#Trim the primitive list to delete coplanar primitives
 
 		if len(prim_list) == 2:
 			if self.isCoplanar(self.modelObject.faces[prim_list[0]], self.modelObject.faces[prim_list[1]]):
+				print("removed a coplanar")
 				prim_list.remove(prim_list[1])
 
 		if len(prim_list) == 3:
@@ -190,6 +186,31 @@ class HapticInterfacePoint():
 			prim_list_trimmed = prim_list
 			for i in to_remove:
 				prim_list_trimmed.remove(prim_list[i])
+
+			print("removed some coplanars ", len(to_remove))
+
+		if len(prim_list_trimmed) > 0:
+			prim_list = prim_list_trimmed
+
+			
+		for i in range(0, 3):
+			try:
+				# print("TRYING SOME SHIT")
+				triangle = self.modelObject.faces[prim_list[i]]
+				# print("Triangle ", i, " is ", triangle)
+				triangle_points = (self.modelObject.vertices[triangle[0]], 
+					self.modelObject.vertices[triangle[1]], self.modelObject.vertices[triangle[2]]) 
+				
+				consts[i] = self.calcPlaneFromPrim(triangle_points)
+			except:
+				# print("NO MORE PRIMS")
+				pass
+		
+		# consts = [a1 b1 c1 d1
+		#           a2 b2 c2 d2
+		#           a3 b3 c3 d3]
+
+		print("OG prim list ", len(prim_list), prim_list)
 
 
 			
@@ -210,7 +231,8 @@ class HapticInterfacePoint():
 				[0, 0, 1, consts[0][2]],
 				[consts[0][0], consts[0][1], consts[0][2], 0]]
 
-			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1])
+			#B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1])
+			B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1])
 
 			# print("A = ", A)
 
@@ -223,7 +245,8 @@ class HapticInterfacePoint():
 				[consts[1][0], consts[1][1], consts[1][2], 0, 0]
 				]
 
-			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1])
+			#B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1])
+			B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1, consts[1][3]*-1])
 		
 		if len(prim_list) >= 3:
 			A = [
@@ -234,7 +257,8 @@ class HapticInterfacePoint():
 				[consts[1][0], consts[1][1], consts[1][2], 0, 0, 0],
 				[consts[2][0], consts[2][1], consts[2][2], 0, 0, 0]]
 
-			B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1, consts[2][3]*-1])
+			#B = np.array([self.previous_position[0], self.previous_position[1], self.previous_position[2], consts[0][3]*-1, consts[1][3]*-1, consts[2][3]*-1])
+			B = np.array([self.current_position[0], self.current_position[1], self.current_position[2], consts[0][3]*-1, consts[1][3]*-1, consts[2][3]*-1])
 
 
 		
@@ -263,6 +287,25 @@ class HapticInterfacePoint():
 		
 		for i in range(0, 3):
 			self.rendered_force[i] = [k[i]*(self.god_object_pos[i] - self.current_position[i])]
+
+
+
+
+if __name__ == '__main__':
+	model = ConcaveCube()
+	hip = HapticInterfacePoint(model)
+	hip.active_planes =[1,2]
+	# hip.previous_position = [0.08, 1.27, 2.12]
+	# hip.previous_position = [0.08, 1.3, 2.12]
+	# hip.previous_position = [0.08, 1.24, 2.12]
+	# hip.current_position = [0.08, 1.27, 2.12]
+	hip.previous_position = [0.0, 0.0, 0.0]
+	hip.current_position = [0.68, 1.63, 2.3]
+
+	go = hip.calculateGodObject(hip.active_planes)
+	print(go)
+
+
 
 
 
