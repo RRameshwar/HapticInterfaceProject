@@ -11,7 +11,11 @@ class CollisionChecker():
 	## This function should perform line-plane test, then if True, perform point-triangle test
 	## Two types of checks: collision with object and updating plain constraints
 	def detectCollision(self, test_faces, hip_position, test_position, constraint_test=False):
-		
+		if constraint_test:
+			print("**** PERFORMING CONSTRAINT DETECTION ****")
+		else:
+			print("\n**** PERFORMING COLLISION DETECTION ****")
+
 		collision = False
 		colliding_faces = []
 		
@@ -26,15 +30,18 @@ class CollisionChecker():
 			triangle_vertices.append(self.modelObjectVertices[face[2]])
 			
 			if constraint_test:
-				print("\nCHECKING PLANE", self.modelObjectFaces.index(face), "IS GOD TEST?", constraint_test)
+				print("\nCHECKING PLANE", self.modelObjectFaces.index(face))
 			
-			## Perform line test, if passes, perform primitive test. If both pass, return the face that passed
+			## Perform line test, if passes, perform primitive test.
 			if self.line_test(triangle_vertices, hip_position, test_position, constraint_test):
 				print("\nLINE TEST PASSED!! Performing prim test...")
+				## Perform primitive test. If pass, return the face that passed
 				if self.primitive_test(triangle_vertices, self.intersect_point, constraint_test):
-					print("PRIM TEST PASSED!! Returning the collided faces...\n")
+					print("PRIM TEST PASSED!! Returning collided face:", self.modelObjectFaces.index(face),"\n")
 					colliding_faces.append(self.modelObjectFaces.index(face))
 					collision = True
+				else:
+					print("PRIM TEST FAILED\n")
 
 		return collision, colliding_faces 
 
@@ -48,7 +55,7 @@ class CollisionChecker():
 		
 		## If performing a constraint update check, add a fudge factor normal to the face we are checking
 		if constraint_test:
-			testPos = testPos - 0.02*n
+			testPos = testPos + 0.02*n
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
@@ -61,13 +68,11 @@ class CollisionChecker():
 		## If both distances are on the same side of the plane (same sign), LINE TEST FAILS
 		if abs(hip_dist_to_plane + test_dist_to_plane) == abs(hip_dist_to_plane) + abs(test_dist_to_plane):
 			return False
-			## Check if negligible distance to plane (when we are constrained)
-			# if abs(test_dist_to_plane) < 0.001:
-			# 	# print("Line Collision! Checking if point intersects a face...", constraint_test)
-			# 	self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
-			# 	return True
+							## Check if negligible distance to plane (when we are constrained)
+							# if abs(test_dist_to_plane) < 0.001:
+							# 	self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
+							# 	return True
 		else:
-			# print("Line Collision! Checking if point intersects a face...", constraint_test)
 			## Calculate the point that falls on the plane
 			self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
 			return True

@@ -34,7 +34,6 @@ class HapticInterfacePoint():
 		self.previous_position = self.current_position
 		
 		if self.inside_object:
-			# print("WE COLLIDED!!!!")
 			## If inside object, let's update our plane constraints recursively
 			self.updatePlaneConstraints()
 		else:
@@ -45,20 +44,6 @@ class HapticInterfacePoint():
 		self.current_position = np.add(self.current_position, transformation)				
 		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_object_pos_prev, " GOD NOW ", self.god_object_pos, " ACTIVE PLANES ", self.active_planes)
 		
-	
-	def updatePossiblePlanes(self):
-		self.possible_planes = []
-		# print("\nList of active planes ", self.active_planes)
-
-		for active_plane in self.active_planes:
-			active_plane_points = self.modelObject_faces[active_plane]
-			# print("Current active plane ", active_plane, active_plane_points, [self.modelObject.vertices[active_plane_points[0]], self.modelObject.vertices[active_plane_points[1]], self.modelObject.vertices[active_plane_points[2]]])
-			for face in self.modelObject_faces:
-				# print("Current face ", face)
-				if (any(item in face for item in active_plane_points)):
-					if not face in self.possible_planes:
-						self.possible_planes.append(face)
-
 
 	def updatePlaneConstraints(self):
 		# print("PLANE CONSTRAINT FIRST UPDATE")
@@ -102,6 +87,23 @@ class HapticInterfacePoint():
 			self.active_planes = new_constraints
 
 		self.god_object_pos = self.calculateGodObject(self.active_planes)
+
+	## Optimization - check neighboring triangles (planes) that share two points with active triangle
+	def updatePossiblePlanes(self):
+		self.possible_planes = []
+		# print("\nList of active planes ", self.active_planes)
+
+		## For each active plane, find neighbors
+		for active_plane in self.active_planes:
+			active_plane_points = self.modelObject_faces[active_plane]
+			# print("Current active plane ", active_plane, active_plane_points, [self.modelObject.vertices[active_plane_points[0]], self.modelObject.vertices[active_plane_points[1]], self.modelObject.vertices[active_plane_points[2]]])
+			
+			## For each object face (must check all faces EVERY time)
+			for face in self.modelObject_faces:
+				## If a single point is shared, continue
+				if (any(point in face for point in active_plane_points)):
+					# if not face in self.possible_planes: ## THIS DOESNT DO ANYTHING?
+					self.possible_planes.append(face)
 
 
 	def calcPlaneFromPrim(self, prim):

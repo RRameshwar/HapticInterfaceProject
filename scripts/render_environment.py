@@ -82,7 +82,7 @@ class render_environment():
 		glBegin(GL_TRIANGLES)
 		for i in range(0, len(self.staticFaces)):
 			if i in prims:
-				glColor4f(0,1,0,1)
+				glColor4f(0,1,0,1) # Highlight active plane
 			else:
 				glColor4f(1,0,0,0.5)
 			for vertex in self.staticFaces[i]:
