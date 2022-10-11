@@ -16,8 +16,8 @@ class HapticInterfacePoint():
 		self.previous_position = initial_position
 
 		self.inside_object = False
-		self.god_object_pos = initial_position
-		self.god_object_pos_prev = initial_position
+		self.god_pos = initial_position
+		self.god_pos_prev = initial_position
 
 		self.active_planes = []
 		self.possible_planes = []
@@ -31,53 +31,53 @@ class HapticInterfacePoint():
 	## This function should move the HIP and (if colliding) the God object positions
 	def updatePos(self, transformation):
 
+		# Update previous hip position
 		self.previous_position = self.current_position
 		
 		if self.inside_object:
-			## If inside object, let's update our plane constraints recursively
+			## If inside object, let's update our plane constraints iteratively
 			self.updatePlaneConstraints()
 		else:
-			## If NOT inside object, let's just update our previous positions
-			self.god_object_pos_prev = self.god_object_pos
-			self.god_object_pos = self.current_position
+			## If NOT inside object, let's just update our god object with the transformation
+			self.god_pos_prev = self.god_pos
+			# self.god_pos = np.add(self.current_position, transformation)
+			self.god_pos = self.current_position
 
+		# Update current hip position by applying transformation
 		self.current_position = np.add(self.current_position, transformation)				
-		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_object_pos_prev, " GOD NOW ", self.god_object_pos, " ACTIVE PLANES ", self.active_planes)
+		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
 		
 
+	## Iteratively update plane constraints. Find new constraints between hip and old god,
+	## THEN Calculate new god, then check constraints between new and old god. 
 	def updatePlaneConstraints(self):
-		# print("PLANE CONSTRAINT FIRST UPDATE")
+
+		## Get neighboring faces sharing a single point ........... MIGHT WANT TO CHANGE THIS TO JUST CHECK THOSE THAT SHARE AN EDGE .............
 		self.updatePossiblePlanes()
 
 		old_constraints = []
 		new_constraints = []
 
-		god_obj_pos_temp = self.god_object_pos
+		god_pos_temp = self.god_pos
 
-		# print("PLANES TO CHECK: ", self.possible_planes)
-		# print("LINE SEGMENT POINTS", self.current_position, self.god_object_pos)
+		## Check neighbors to see if they are a new constraint - USING PREV GOD OBJ POS
+		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
 
-		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
 
-		# print("NEW CONSTRAINTS ", new_constraints)
-		# if new_constraints == []:
-			# print("\nNEW CONSTRAINTS IS EMPTY WTF\n")
-		
-
-		count = 1
+		# count = 1
 		# print("FIRST GO CALC IS DONE ")
 
-		while not (old_constraints == new_constraints):
-			count = count + 1
+		while old_constraints != new_constraints:
+			# count = count + 1
 			# print("CHECKING GO AGAIN ", count, new_constraints)
 			old_constraints = new_constraints
-			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_object_pos_prev, True) # Collision check based on old god object position
+			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
 
-			god_obj_pos_temp = self.calculateGodObject(new_constraints)
+			god_pos_temp = self.calculateGodObject(new_constraints)
 
-		# print("TEMP GOD OBJECT AFTER UPDATING PLANE CONSTRAINTS IS ", god_obj_pos_temp)
+		# print("TEMP GOD OBJECT AFTER UPDATING PLANE CONSTRAINTS IS ", god_pos_temp)
 
-		self.god_object_pos_prev = self.god_object_pos
+		self.god_pos_prev = self.god_pos
 		
 
 		if len(new_constraints) > 4:
@@ -86,12 +86,13 @@ class HapticInterfacePoint():
 		else:
 			self.active_planes = new_constraints
 
-		self.god_object_pos = self.calculateGodObject(self.active_planes)
+		self.god_pos = self.calculateGodObject(self.active_planes)
 
-	## Optimization - check neighboring triangles (planes) that share two points with active triangle
+
+	## Optimization - check neighboring triangles (planes) that share a single point with active triangle
 	def updatePossiblePlanes(self):
 		self.possible_planes = []
-		# print("\nList of active planes ", self.active_planes)
+		print("\nList of active planes ", self.active_planes)
 
 		## For each active plane, find neighbors
 		for active_plane in self.active_planes:
@@ -100,10 +101,9 @@ class HapticInterfacePoint():
 			
 			## For each object face (must check all faces EVERY time)
 			for face in self.modelObject_faces:
-				## If a single point is shared, continue
 				if (any(point in face for point in active_plane_points)):
-					# if not face in self.possible_planes: ## THIS DOESNT DO ANYTHING?
-					self.possible_planes.append(face)
+					# if not face in self.possible_planes: ## THIS DOESNT DO ANYTHING? Oct 11 12:04am
+					self.possible_planes.append(face) # This will include our active plane as well
 
 
 	def calcPlaneFromPrim(self, prim):
@@ -269,7 +269,7 @@ class HapticInterfacePoint():
 		k = [17, 17, 17]
 		
 		for i in range(0, 3):
-			self.rendered_force[i] = [k[i]*(self.god_object_pos[i] - self.current_position[i])]
+			self.rendered_force[i] = [k[i]*(self.god_pos[i] - self.current_position[i])]
 
 
 

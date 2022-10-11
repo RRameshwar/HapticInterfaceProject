@@ -188,8 +188,9 @@ class render_environment():
 
 			self.drawObject(prims) 
 			self.drawWire()
-			self.drawHIP(hip.current_position)			
-			self.drawGod(hip.god_object_pos)
+			# self.drawHIP(hip.current_position)
+			self.drawHIP(hip.previous_position)
+			self.drawGod(hip.god_pos)
 			self.drawOrigin()
 		
 			pg.display.flip()

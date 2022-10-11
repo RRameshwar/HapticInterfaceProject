@@ -30,7 +30,7 @@ class CollisionChecker():
 			triangle_vertices.append(self.modelObjectVertices[face[2]])
 			
 			if constraint_test:
-				print("\nCHECKING PLANE", self.modelObjectFaces.index(face))
+				print("\nCHECKING PLANE", self.modelObjectFaces.index(face), triangle_vertices)
 			
 			## Perform line test, if passes, perform primitive test.
 			if self.line_test(triangle_vertices, hip_position, test_position, constraint_test):
