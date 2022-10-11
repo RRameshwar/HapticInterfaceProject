@@ -11,9 +11,7 @@ class CollisionChecker():
 	## This function should perform line-plane test, then if True, perform point-triangle test
 	## Two types of checks: collision with object and updating plain constraints
 	def detectCollision(self, test_faces, hip_position, test_position, constraint_test=False):
-		if constraint_test:
-			print("**** PERFORMING CONSTRAINT DETECTION ****")
-		else:
+		if not constraint_test:
 			print("\n**** PERFORMING COLLISION DETECTION ****")
 
 		collision = False
@@ -55,7 +53,7 @@ class CollisionChecker():
 		
 		## If performing a constraint update check, add a fudge factor normal to the face we are checking
 		if constraint_test:
-			testPos = testPos + 0.02*n
+			testPos = testPos - 0.05*n
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)

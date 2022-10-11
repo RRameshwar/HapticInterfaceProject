@@ -48,45 +48,62 @@ class HapticInterfacePoint():
 		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
 		
 
-	## Iteratively update plane constraints. Find new constraints between hip and old god,
-	## THEN Calculate new god, then check constraints between new and old god. 
+	## Iteratively update plane constraints. Find new constraints between hip and old god, and update god object
+	## THEN check constraints between new and old god and update god object AGAIN.
 	def updatePlaneConstraints(self):
 
 		## Get neighboring faces sharing a single point ........... MIGHT WANT TO CHANGE THIS TO JUST CHECK THOSE THAT SHARE AN EDGE .............
 		self.updatePossiblePlanes()
 
-		old_constraints = []
-		new_constraints = []
+		## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
+		is_coll, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
+		old_constraints = [*set(old_constraints)] # This removes duplicates
 
-		god_pos_temp = self.god_pos
+		print("\nSecond constraint check")
+		## Update god object for the FIRST TIME
+		temp_god_pos = self.calculateGod(old_constraints)
 
-		## Check neighbors to see if they are a new constraint - USING PREV GOD OBJ POS
-		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
+		## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
+		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True)
+		new_constraints = [*set(new_constraints)] # This removes duplicates
+
+		print("OLD CONSTRAINTS:", old_constraints)
+		print("NEW CONSTRAINTS:", new_constraints)
+		## Combine all of our current constraints
+		self.active_planes = old_constraints + new_constraints
+
+		print("ACTIVE PLANES:", self.active_planes)
+
+		## Update god object for the SECOND TIME
+		temp_god_pos = self.calculateGod(self.active_planes)
+
+		self.god_pos_prev = self.god_pos
+		self.god_pos = temp_god_pos
 
 
 		# count = 1
 		# print("FIRST GO CALC IS DONE ")
 
-		while old_constraints != new_constraints:
-			# count = count + 1
-			# print("CHECKING GO AGAIN ", count, new_constraints)
-			old_constraints = new_constraints
-			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
+		# while old_constraints != new_constraints:
+		# 	# count = count + 1
+		# 	# print("CHECKING GO AGAIN ", count, new_constraints)
+		# 	old_constraints = new_constraints
+		# 	is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
 
-			god_pos_temp = self.calculateGodObject(new_constraints)
+			# god_pos_temp = self.calculateGod(new_constraints)
 
 		# print("TEMP GOD OBJECT AFTER UPDATING PLANE CONSTRAINTS IS ", god_pos_temp)
 
-		self.god_pos_prev = self.god_pos
+		# self.god_pos_prev = self.god_pos
 		
 
-		if len(new_constraints) > 4:
-			self.active_planes = self.active_planes
-			print("TRUNCED ACTIVE PLANES")
-		else:
-			self.active_planes = new_constraints
+		# if len(new_constraints) > 4:
+		# 	self.active_planes = self.active_planes
+		# 	print("TRUNCED ACTIVE PLANES")
+		# else:
+		# 	self.active_planes = new_constraints
 
-		self.god_pos = self.calculateGodObject(self.active_planes)
+		# self.god_pos = self.calculateGod(self.active_planes)
 
 
 	## Optimization - check neighboring triangles (planes) that share a single point with active triangle
@@ -147,7 +164,9 @@ class HapticInterfacePoint():
 		if abs(np.linalg.norm(check_cross)) == 0.0:
 			return True
 
-	def calculateGodObject(self, prim_list):
+
+	## Returns new calculated god object position minimizing distance b/w hip and god while maintaining constraint
+	def calculateGod(self, prim_list):
 
 		consts = np.zeros([3,4])
 		prim_list_trimmed = []
@@ -285,7 +304,7 @@ if __name__ == '__main__':
 	hip.previous_position = [0.0, 0.0, 0.0]
 	hip.current_position = [0.68, 1.63, 2.3]
 
-	go = hip.calculateGodObject(hip.active_planes)
+	go = hip.calculateGod(hip.active_planes)
 	print(go)
 
 
