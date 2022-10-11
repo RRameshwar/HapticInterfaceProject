@@ -45,7 +45,7 @@ class HapticInterfacePoint():
 
 		# Update current hip position by applying transformation
 		self.current_position = np.add(self.current_position, transformation)				
-		print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
+		# print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
 		
 
 	## Iteratively update plane constraints. Find new constraints between hip and old god, and update god object
@@ -59,7 +59,7 @@ class HapticInterfacePoint():
 		is_coll, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
 		old_constraints = [*set(old_constraints)] # This removes duplicates
 
-		print("\nSecond constraint check")
+		# print("\nSecond constraint check")
 		## Update god object for the FIRST TIME
 		temp_god_pos = self.calculateGod(old_constraints)
 
@@ -67,12 +67,12 @@ class HapticInterfacePoint():
 		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True)
 		new_constraints = [*set(new_constraints)] # This removes duplicates
 
-		print("OLD CONSTRAINTS:", old_constraints)
-		print("NEW CONSTRAINTS:", new_constraints)
+		# print("OLD CONSTRAINTS:", old_constraints)
+		# print("NEW CONSTRAINTS:", new_constraints)
 		## Combine all of our current constraints
 		self.active_planes = old_constraints + new_constraints
 
-		print("ACTIVE PLANES:", self.active_planes)
+		# print("ACTIVE PLANES:", self.active_planes)
 
 		## Update god object for the SECOND TIME
 		temp_god_pos = self.calculateGod(self.active_planes)
@@ -109,7 +109,7 @@ class HapticInterfacePoint():
 	## Optimization - check neighboring triangles (planes) that share a single point with active triangle
 	def updatePossiblePlanes(self):
 		self.possible_planes = []
-		print("\nList of active planes ", self.active_planes)
+		# print("\nList of active planes ", self.active_planes)
 
 		## For each active plane, find neighbors
 		for active_plane in self.active_planes:
@@ -175,7 +175,7 @@ class HapticInterfacePoint():
 
 		if len(prim_list) == 2:
 			if self.isCoplanar(self.modelObject.faces[prim_list[0]], self.modelObject.faces[prim_list[1]]):
-				print("removed a coplanar")
+				# print("removed a coplanar")
 				prim_list.remove(prim_list[1])
 
 		if len(prim_list) == 3:
@@ -191,7 +191,7 @@ class HapticInterfacePoint():
 			for i in to_remove:
 				prim_list_trimmed.remove(prim_list[i])
 
-			print("removed some coplanars ", len(to_remove))
+			# print("removed some coplanars ", len(to_remove))
 
 		if len(prim_list_trimmed) > 0:
 			prim_list = prim_list_trimmed
@@ -214,7 +214,7 @@ class HapticInterfacePoint():
 		#           a2 b2 c2 d2
 		#           a3 b3 c3 d3]
 
-		print("OG prim list (len, list)", len(prim_list), prim_list)
+		# print("OG prim list (len, list)", len(prim_list), prim_list)
 
 
 			
