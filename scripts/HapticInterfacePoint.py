@@ -26,6 +26,7 @@ class HapticInterfacePoint():
 		self.god_pos_prev = initial_position
 
 		self.active_planes = []
+		self.active_planes_prev = []
 		self.possible_planes = []
 		self.rendered_force = [0, 0, 0]
 
@@ -71,42 +72,46 @@ class HapticInterfacePoint():
 		## Get neighboring faces sharing a single point ........... MIGHT WANT TO CHANGE THIS TO JUST CHECK THOSE THAT SHARE AN EDGE .............
 		self.updatePossiblePlanes()
 
-		## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
-		is_coll, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
-		old_constraints = [*set(old_constraints)] # This removes duplicates
+		self.active_planes_prev = []
 		
+		while self.active_planes != self.active_planes_prev:
+			## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
+			is_coll, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
+			old_constraints = [*set(old_constraints)] # This removes duplicates
+			
 
-		# print("\nSecond constraint check")
-		## Update god object for the FIRST TIME
-		temp_god_pos = self.calculateGod(old_constraints)
+			# print("\nSecond constraint check")
+			## Update god object for the FIRST TIME
+			temp_god_pos = self.calculateGod(old_constraints)
 
 
-		# ## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
-		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True, True)
-		new_constraints = [*set(new_constraints)] # This removes duplicates
+			# ## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
+			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.god_pos_prev, temp_god_pos, True, True)
+			new_constraints = [*set(new_constraints)] # This removes duplicates
 
 
-		# temp_god_pos = self.calculateGod(new_constraints)
-		
-		# ## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
-		# is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, temp_god_pos, True)
-		# new_constraints = [*set(old_constraints)] # This removes duplicates
+			# temp_god_pos = self.calculateGod(new_constraints)
+			
+			# ## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
+			# is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, temp_god_pos, True)
+			# new_constraints = [*set(old_constraints)] # This removes duplicates
 
-		# temp_god_pos = self.calculateGod(new_constraints)
+			# temp_god_pos = self.calculateGod(new_constraints)
 
-		print("OLD CONSTRAINTS:", old_constraints)
-		print("NEW CONSTRAINTS:", new_constraints)
-		## Combine all of our current constraints
+			print("OLD CONSTRAINTS:", old_constraints)
+			print("NEW CONSTRAINTS:", new_constraints)
+			## Combine all of our current constraints
+			self.active_planes_prev = self.active_planes
+			self.active_planes = new_constraints + old_constraints
 
-		self.active_planes = new_constraints + old_constraints
+			print("ACTIVE PLANES:", self.active_planes)
+			print("PREV ACTIVE PLANES:", self.active_planes_prev)
 
-		# print("ACTIVE PLANES:", self.active_planes)
+			## Update god object for the SECOND TIME
+			temp_god_pos = self.calculateGod(self.active_planes)
 
-		## Update god object for the SECOND TIME
-		temp_god_pos = self.calculateGod(self.active_planes)
-
-		self.god_pos_prev = self.god_pos
-		self.god_pos = temp_god_pos
+			self.god_pos_prev = self.god_pos
+			self.god_pos = temp_god_pos
 
 
 		# count = 1

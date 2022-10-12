@@ -73,6 +73,10 @@ class CollisionChecker():
 		else:
 			## Calculate the point that falls on the plane
 			self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
+			if test_dist_to_plane > 0:
+				print("BROOOOOOOOOOOOOOOOOOOOOOO WERE UNDER THE PLANE BROOOOOOOOOOOOOOOOOOOOOOOOOO")
+			if hip_dist_to_plane < 0:
+				print("HIP ABOVE THE PLANE DAWGGGGGGGGGG")
 			return True
 
 
