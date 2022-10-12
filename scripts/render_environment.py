@@ -29,10 +29,6 @@ class render_environment():
 		self.transf = [0,0,0] # No transf at first
 		self.createOrigin()
 
-		# self.hip = hip
-
-		# self.hip = HapticInterfacePoint(initial_position = (0.2, 0.2 ,-2.0))
-
 		self.displayCenter = [screen.get_size()[i] // 4 for i in range(2)]
 		self.mouseMove = [0, 0]
 		pg.mouse.set_pos(self.displayCenter)
@@ -40,7 +36,6 @@ class render_environment():
 		self.up_down_angle = 0.0
 		self.paused = False
 		self.run = True
-		self.transformation = [0, 0, 0]
 
 
 	def createStaticObj(self,vertices,edges,faces):  # Only for a wireframe display (lines + edges)

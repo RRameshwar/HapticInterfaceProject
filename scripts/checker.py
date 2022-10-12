@@ -28,19 +28,14 @@ class CollisionChecker():
 			triangle_vertices.append(self.modelObjectVertices[face[1]])
 			triangle_vertices.append(self.modelObjectVertices[face[2]])
 			
-			if constraint_test:
-				print("\nCHECKING PLANE", self.modelObjectFaces.index(face), triangle_vertices)
-			
 			## Perform line test, if passes, perform primitive test.
 			if self.line_test(triangle_vertices, hip_position, test_position, constraint_test):
-				print("\nLINE TEST PASSED!! Performing prim test...")
+
 				## Perform primitive test. If pass, return the face that passed
-				if self.primitive_test(triangle_vertices, self.intersect_point, constraint_test, concave):
-					# print("PRIM TEST PASSED!! Returning collided face:", self.modelObjectFaces.index(face),"\n")
+				if self.primitive_test(triangle_vertices, self.intersect_point, concave):
+
 					colliding_faces.append(self.modelObjectFaces.index(face))
 					collision = True
-				# else:
-					# print("PRIM TEST FAILED\n")
 
 		return collision, colliding_faces 
 
@@ -58,49 +53,21 @@ class CollisionChecker():
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
-		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) + 0.00001
+		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) + 0.01
 
 		# if constraint_test:
-			# print("HIP TO PLANE", hip_dist_to_plane, "TEST TO PLANE", test_dist_to_plane)
-			# print("HIP POS", hipPos, "TEST POS", testPos)
+		# 	test_dist_to_plane += 0.01 ## Fudge factor
 
 		## If both distances are on the same side of the plane (same sign), LINE TEST FAILS
 		if abs(hip_dist_to_plane + test_dist_to_plane) == abs(hip_dist_to_plane) + abs(test_dist_to_plane):
 			return False
-							## Check if negligible distance to plane (when we are constrained)
-							# if abs(test_dist_to_plane) < 0.001:
-							# 	self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
-							# 	return True
 		else:
 			## Calculate the point that falls on the plane
-			self.intersect_point = (hip_dist_to_plane*testPos - test_dist_to_plane*hipPos)/(hip_dist_to_plane - test_dist_to_plane)
-			if test_dist_to_plane > 0:
-				print("BROOOOOOOOOOOOOOOOOOOOOOO WERE UNDER THE PLANE BROOOOOOOOOOOOOOOOOOOOOOOOOO")
-			if hip_dist_to_plane < 0:
-				print("HIP ABOVE THE PLANE DAWGGGGGGGGGG")
+			self.intersect_point = np.subtract(hip_dist_to_plane*testPos , test_dist_to_plane*hipPos)/np.subtract(hip_dist_to_plane , test_dist_to_plane)
 			return True
 
 
-	def detectCollision_primitive_test_2(self,tri,p):
-		tri_translated = []
-		for point in tri:
-			tri_translated.append(np.subtract(point, p))
-
-		u = np.cross(tri_translated[0], tri_translated[1])
-		v = np.cross(tri_translated[0], tri_translated[2])
-		w = np.cross(tri_translated[1], tri_translated[2])
-
-		if np.dot(u,v) < 0:
-			return False
-		if np.dot(u,w) < 0:
-			return False
-
-		#print("Primitive Collision Detected!")
-
-		return True
-
-
-	def primitive_test(self, tri, p, constraint_test, concave):
+	def primitive_test(self, tri, p, concave):
 		## Detect collision between a point and a triangle
 		tri = np.array(tri)
 		p = np.array(p)
@@ -113,12 +80,16 @@ class CollisionChecker():
 		beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 
 		
-		# Check collision conditions as a boolean list
+		## Check collision conditions as a boolean list
 		if type(self.modelObject) == type(ConcavePrism()):
 			print("Concave Prism")
 			check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
 		else:
 			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
-		# print(alpha, beta, check)
 
+
+		# if concave:
+		# 	check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
+		# else:
+		# 	check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
 		return all(check)
