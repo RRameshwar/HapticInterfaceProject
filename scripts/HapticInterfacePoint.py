@@ -47,7 +47,8 @@ class HapticInterfacePoint():
 
 		# Update previous hip position
 		self.previous_position = self.current_position
-		
+		self.current_position = np.add(self.current_position, transformation)				
+
 		if self.inside_object:
 			## If inside object, let's update our plane constraints iteratively
 			self.updatePlaneConstraints()
@@ -55,10 +56,10 @@ class HapticInterfacePoint():
 			## If NOT inside object, let's just update our god object with the transformation
 			self.god_pos_prev = self.god_pos
 			# self.god_pos = np.add(self.current_position, transformation)
-			self.god_pos = self.current_position
+			self.god_pos = self.previous_position
 
 		# Update current hip position by applying transformation
-		self.current_position = np.add(self.current_position, transformation)				
+		# self.current_position = np.add(self.current_position, transformation)				
 		
 		self.calculateForce()
 		# print("CURRENT FORCE = ", np.linalg.norm(self.rendered_force))
@@ -86,7 +87,7 @@ class HapticInterfacePoint():
 
 
 			# ## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
-			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.god_pos_prev, temp_god_pos, True, True)
+			is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True, True)
 			new_constraints = [*set(new_constraints)] # This removes duplicates
 
 
@@ -310,7 +311,10 @@ class HapticInterfacePoint():
 		#  a2 b2 c2  0 0  0
 		#  a3 b3 c3  0 0  0 ]
 
-		x_godobj = np.dot(np.linalg.inv(A), B)
+		if len(prim_list) == 0:
+			x_godobj = self.god_pos_prev
+		else:
+			x_godobj = np.dot(np.linalg.inv(A), B)
 
 		#print("HIP POSITION ", self.current_position)
 		print("PRIM LIST FINAL ", prim_list)

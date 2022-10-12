@@ -26,10 +26,11 @@ if __name__ == '__main__':
 	# model = ModelObject('tree.obj')
 	# model = ModelObject('actual_cube.obj')
 	# model = ModelObject('hex_prism.obj')
+	model = ModelObject('icosahedron.obj')
 
 	# model = Cube()
 	# model = ConcaveCube()
-	model = ConcavePrism()	
+	# model = ConcavePrism() ######## THIS OUR GUY
 	# model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
 

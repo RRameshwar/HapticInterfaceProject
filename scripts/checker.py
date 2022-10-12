@@ -1,5 +1,6 @@
 import numpy as np
 import time
+from myObject import *
 
 class CollisionChecker():
 	def __init__(self, object):
@@ -57,7 +58,7 @@ class CollisionChecker():
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
-		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) - 0.05
+		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) + 0.00001
 
 		# if constraint_test:
 			# print("HIP TO PLANE", hip_dist_to_plane, "TEST TO PLANE", test_dist_to_plane)
@@ -113,7 +114,11 @@ class CollisionChecker():
 
 		
 		# Check collision conditions as a boolean list
-		check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
-		print(alpha, beta, check)
+		if type(self.modelObject) == type(ConcavePrism()):
+			print("Concave Prism")
+			check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
+		else:
+			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
+		# print(alpha, beta, check)
 
 		return all(check)
