@@ -52,12 +52,12 @@ class CollisionChecker():
 		n = n/np.linalg.norm(n)
 		
 		## If performing a constraint update check, add a fudge factor normal to the face we are checking
-		if constraint_test:
-			testPos = testPos - 0.05*n
+		# if constraint_test:
+		# 	testPos = testPos - 0.05*n
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
-		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) #- 0.05
+		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) - 0.05
 
 		# if constraint_test:
 			# print("HIP TO PLANE", hip_dist_to_plane, "TEST TO PLANE", test_dist_to_plane)
