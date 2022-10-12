@@ -13,24 +13,30 @@ from modelObject import *
 import pywavefront
 import time
 
+
+
+
+
 if __name__ == '__main__':
+
 	gl = render_environment()
 
-	model = ModelObject('dodecahedron.obj')
+	# model = ModelObject('dodecahedron.obj')
 	# model = ModelObject('bunny.obj')
 	# model = ModelObject('tree.obj')
 	# model = ModelObject('actual_cube.obj')
+	# model = ModelObject('hex_prism.obj')
 
 	# model = Cube()
 	# model = ConcaveCube()
-	# model = ConcavePrism()	
+	model = ConcavePrism()	
 	# model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
 
 
 	checker = CollisionChecker(model) # From checker.py
 
-	pointVertex = (0.5, 1.35, 2)
-	# pointVertex = (2, 1.3, 6.0)
+	#pointVertex = (0.5, 1.35, 2)
+	pointVertex = (2, 1.3, 6.0)
 
 	gl.createStaticObj(model.vertices, model.edges, model.faces)
 	gl.createHIP(pointVertex)

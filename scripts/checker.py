@@ -10,7 +10,7 @@ class CollisionChecker():
 
 	## This function should perform line-plane test, then if True, perform point-triangle test
 	## Two types of checks: collision with object and updating plain constraints
-	def detectCollision(self, test_faces, hip_position, test_position, constraint_test=False):
+	def detectCollision(self, test_faces, hip_position, test_position, constraint_test=False, concave=False):
 		# if not constraint_test:
 			# print("\n**** PERFORMING COLLISION DETECTION ****")
 
@@ -27,14 +27,14 @@ class CollisionChecker():
 			triangle_vertices.append(self.modelObjectVertices[face[1]])
 			triangle_vertices.append(self.modelObjectVertices[face[2]])
 			
-			# if constraint_test:
-				# print("\nCHECKING PLANE", self.modelObjectFaces.index(face), triangle_vertices)
+			if constraint_test:
+				print("\nCHECKING PLANE", self.modelObjectFaces.index(face), triangle_vertices)
 			
 			## Perform line test, if passes, perform primitive test.
 			if self.line_test(triangle_vertices, hip_position, test_position, constraint_test):
-				# print("\nLINE TEST PASSED!! Performing prim test...")
+				print("\nLINE TEST PASSED!! Performing prim test...")
 				## Perform primitive test. If pass, return the face that passed
-				if self.primitive_test(triangle_vertices, self.intersect_point, constraint_test):
+				if self.primitive_test(triangle_vertices, self.intersect_point, constraint_test, concave):
 					# print("PRIM TEST PASSED!! Returning collided face:", self.modelObjectFaces.index(face),"\n")
 					colliding_faces.append(self.modelObjectFaces.index(face))
 					collision = True
@@ -53,12 +53,12 @@ class CollisionChecker():
 		
 		## If performing a constraint update check, add a fudge factor normal to the face we are checking
 		if constraint_test:
-			testPos = testPos + 0.05*n
+			testPos = testPos - 0.05*n
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
-		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3)
-	
+		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) #- 0.05
+
 		# if constraint_test:
 			# print("HIP TO PLANE", hip_dist_to_plane, "TEST TO PLANE", test_dist_to_plane)
 			# print("HIP POS", hipPos, "TEST POS", testPos)
@@ -95,11 +95,10 @@ class CollisionChecker():
 		return True
 
 
-	def primitive_test(self, tri, p, constraint_test):
+	def primitive_test(self, tri, p, constraint_test, concave):
 		## Detect collision between a point and a triangle
 		tri = np.array(tri)
 		p = np.array(p)
-
 		
 		u = np.subtract(tri[1], tri[0])
 		v = np.subtract(tri[2], tri[0])
@@ -108,11 +107,9 @@ class CollisionChecker():
 		alpha = (np.dot(u,v) * np.dot(w,v) - np.dot(v,v) * np.dot(w,u)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 		beta = (np.dot(u,v) * np.dot(w,u) - np.dot(u,u) * np.dot(w,v)) / (np.dot(u,v)**2 - np.dot(u,u) * np.dot(v,v))
 
+		
 		# Check collision conditions as a boolean list
-		if constraint_test:
-			check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
-
-		else:
-			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
+		check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
+		print(alpha, beta, check)
 
 		return all(check)

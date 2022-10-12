@@ -9,6 +9,12 @@ from checker import *
 import numpy as np
 from myObject import *
 
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
+
+import datetime as dt
+
 class HapticInterfacePoint():
 	def __init__(self, modelObject, initial_position=[0, 0, 0]):
 		self.initial_position = initial_position
@@ -28,6 +34,13 @@ class HapticInterfacePoint():
 
 		self.checker = CollisionChecker(self.modelObject)
 
+		self.xs = []
+		self.ys = []
+
+		self.fig = plt.figure()
+		self.ax1 = self.fig.add_subplot(1,1,1)
+		self.isConcave = False
+
 	## This function should move the HIP and (if colliding) the God object positions
 	def updatePos(self, transformation):
 
@@ -45,6 +58,9 @@ class HapticInterfacePoint():
 
 		# Update current hip position by applying transformation
 		self.current_position = np.add(self.current_position, transformation)				
+		
+		self.calculateForce()
+		# print("CURRENT FORCE = ", np.linalg.norm(self.rendered_force))
 		# print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
 		
 
@@ -58,19 +74,31 @@ class HapticInterfacePoint():
 		## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
 		is_coll, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True)
 		old_constraints = [*set(old_constraints)] # This removes duplicates
+		
 
 		# print("\nSecond constraint check")
 		## Update god object for the FIRST TIME
 		temp_god_pos = self.calculateGod(old_constraints)
 
-		## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
-		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True)
+
+		# ## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
+		is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True, True)
 		new_constraints = [*set(new_constraints)] # This removes duplicates
 
-		# print("OLD CONSTRAINTS:", old_constraints)
-		# print("NEW CONSTRAINTS:", new_constraints)
+
+		# temp_god_pos = self.calculateGod(new_constraints)
+		
+		# ## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
+		# is_coll, new_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, temp_god_pos, True)
+		# new_constraints = [*set(old_constraints)] # This removes duplicates
+
+		# temp_god_pos = self.calculateGod(new_constraints)
+
+		print("OLD CONSTRAINTS:", old_constraints)
+		print("NEW CONSTRAINTS:", new_constraints)
 		## Combine all of our current constraints
-		self.active_planes = old_constraints + new_constraints
+
+		self.active_planes = new_constraints + old_constraints
 
 		# print("ACTIVE PLANES:", self.active_planes)
 
@@ -280,11 +308,12 @@ class HapticInterfacePoint():
 		x_godobj = np.dot(np.linalg.inv(A), B)
 
 		#print("HIP POSITION ", self.current_position)
-		# print("GO POSITION ", x_godobj)
+		print("PRIM LIST FINAL ", prim_list)
+		print("GO POSITION ", x_godobj)
 
 		return np.array([x_godobj[0], x_godobj[1], x_godobj[2]])
 
-	def calculateForce():
+	def calculateForce(self):
 		k = [17, 17, 17]
 		
 		for i in range(0, 3):
