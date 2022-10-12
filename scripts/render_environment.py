@@ -8,7 +8,7 @@ from HapticInterfacePoint import *
 
 class render_environment():
 	def __init__(self):
-		self.display = (1000, 700)
+		self.display = (1250, 850)
 		pg.init()
 		screen = pg.display.set_mode(self.display, DOUBLEBUF|OPENGL)
 		glMatrixMode(GL_PROJECTION)

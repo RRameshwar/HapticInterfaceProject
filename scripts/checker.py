@@ -53,7 +53,7 @@ class CollisionChecker():
 
 		## Calculate distance of hip and god from the plane
 		hip_dist_to_plane = round(np.dot(np.subtract(hipPos, tri[0]), n), 3)
-		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) + 0.01
+		test_dist_to_plane = round(np.dot(np.subtract(testPos, tri[0]), n), 3) + 0.005
 
 		# if constraint_test:
 		# 	test_dist_to_plane += 0.01 ## Fudge factor
@@ -82,8 +82,7 @@ class CollisionChecker():
 		
 		## Check collision conditions as a boolean list
 		if type(self.modelObject) == type(ConcavePrism()):
-			print("Concave Prism")
-			check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
+			check = [alpha>=-0.05, beta>=-0.05, alpha+beta<=1.05]
 		else:
 			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
 
