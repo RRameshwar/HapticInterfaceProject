@@ -58,7 +58,7 @@ class HapticInterfacePoint():
 			
 		
 		self.calculateForce()
-		# print("CURRENT FORCE = ", np.linalg.norm(self.rendered_force))
+		print("CURRENT FORCE = ", round(np.linalg.norm(self.rendered_force),3))
 		# print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
 		
 
@@ -72,40 +72,41 @@ class HapticInterfacePoint():
 		self.active_planes_prev = []
 
 		## Iterate both checks until there are no constraint updates		
-		# while self.active_planes != self.active_planes_prev:
+		while self.active_planes != self.active_planes_prev:
 
-		## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
-		__, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True, self.isConcave)
-		old_constraints = [*set(old_constraints)] # This removes duplicates
+			## Check neighbors to see if they are a new constraint - USING OLD GOD OBJ AND HIP
+			__, old_constraints = self.checker.detectCollision(self.possible_planes, self.current_position, self.god_pos_prev, True, self.isConcave)
+			old_constraints = [*set(old_constraints)] # This removes duplicates
+			
+			## ****** IMPORTANT ****** 
+			## When we are adding concave constraints, we only pass the point test if we add a constant.
+			## self.isConcave checks whether we are adding a constraint or simply rolling around a convex surface
+			# if old_constraints in self.active_planes:
+			# 	self.isConcave = True
+			# else:
+			# 	self.isConcave = False
 		
-		## ****** IMPORTANT ****** 
-		## When we are adding concave constraints, we only pass the point test if we add a constant.
-		## self.isConcave checks whether we are adding a constraint or simply rolling around a convex surface
-		# if old_constraints in self.active_planes:
-		# 	self.isConcave = True
-		# else:
-		# 	self.isConcave = False
-	
-		## Calculate temporary god position just to find new constraints, if any
-		temp_god_pos = self.calculateGod(old_constraints)
+			## Calculate temporary god position just to find new constraints, if any
+			temp_god_pos = self.calculateGod(old_constraints)
 
 
-		## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
-		__, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True, self.isConcave)
-		new_constraints = [*set(new_constraints)] # This removes duplicates
+			## Check neighbors to see if new constraint - USING OLD GOD OBJ AND NEW GOD OBJ
+			__, new_constraints = self.checker.detectCollision(self.possible_planes, temp_god_pos, self.god_pos_prev, True, self.isConcave)
+			new_constraints = [*set(new_constraints)] # This removes duplicates
 
 
 
-		## Combine all of our current constraints
-		self.active_planes_prev = self.active_planes
-		self.active_planes = new_constraints + old_constraints
+			## Combine all of our current constraints
+			self.active_planes_prev = self.active_planes
+			self.active_planes = new_constraints + old_constraints
+			self.active_planes = [*set(self.active_planes)]
 
-		## Update god object for the SECOND TIME
-		self.god_pos_prev = self.god_pos
-		self.god_pos = self.calculateGod(self.active_planes)
+			## Update god object for the SECOND TIME
+			self.god_pos_prev = self.god_pos
+			self.god_pos = self.calculateGod(self.active_planes)
 
-		print("OLD CONSTRAINTS:", old_constraints, "NEW CONSTRAINTS:", new_constraints)
-		print("ACTIVE PLANES:", self.active_planes, "PREV ACTIVE PLANES:", self.active_planes_prev)
+			# print("OLD CONSTRAINTS:", old_constraints, "NEW CONSTRAINTS:", new_constraints)
+			# print("ACTIVE PLANES:", self.active_planes, "PREV ACTIVE PLANES:", self.active_planes_prev)
 
 
 	## Optimization - check neighboring triangles (planes) that share a single point with active triangle
@@ -170,6 +171,7 @@ class HapticInterfacePoint():
 	## Returns new calculated god object position minimizing distance b/w hip and god while maintaining constraint
 	def calculateGod(self, prim_list):
 
+		# print("OG PURE PRIM LIST:", prim_list)
 		consts = np.zeros([3,4])
 		prim_list_trimmed = []
 
@@ -180,20 +182,27 @@ class HapticInterfacePoint():
 				# print("removed a coplanar")
 				prim_list.remove(prim_list[1])
 
-		if len(prim_list) == 3:
+		if len(prim_list) >= 3:
 			to_remove = []
-			if self.isCoplanar(self.model.faces[prim_list[0]], self.model.faces[prim_list[1]]):
-				to_remove.append(1)
-			if self.isCoplanar(self.model.faces[prim_list[0]], self.model.faces[prim_list[2]]):
-				to_remove.append(2)
-			if self.isCoplanar(self.model.faces[prim_list[1]], self.model.faces[prim_list[2]]):
-				to_remove.append(2)
+			for num, prim in enumerate(prim_list):
+				for num2, prim2 in enumerate(prim_list[num+1:-1]):
+					if self.isCoplanar(self.model_faces[prim], self.model_faces[prim2]):
+						to_remove.append(num2)
+						# print("FOUND SOME COPLANARS",prim, prim2)
+
+
+			# if self.isCoplanar(self.model.faces[prim_list[0]], self.model.faces[prim_list[1]]):
+			# 	to_remove.append(1)
+			# if self.isCoplanar(self.model.faces[prim_list[0]], self.model.faces[prim_list[2]]):
+			# 	to_remove.append(2)
+			# if self.isCoplanar(self.model.faces[prim_list[1]], self.model.faces[prim_list[2]]):
+			# 	to_remove.append(2)
 
 			prim_list_trimmed = prim_list
 			for i in to_remove:
 				prim_list_trimmed.remove(prim_list[i])
 
-			# print("removed some coplanars ", len(to_remove))
+			# print("Trimmed List:", prim_list_trimmed)
 
 		if len(prim_list_trimmed) > 0:
 			prim_list = prim_list_trimmed
@@ -229,6 +238,10 @@ class HapticInterfacePoint():
 		# 	[consts[0][0], consts[0][1], consts[0][2], 0, 0, 0],
 		# 	[consts[1][0], consts[1][1], consts[1][2], 0, 0, 0],
 		# 	[consts[2][0], consts[2][1], consts[2][2], 0, 0, 0]]
+
+		if len(prim_list) == 0:
+			A = np.eye(3)
+			B = np.array([self.current_position[0], self.current_position[1], self.current_position[2]])
 
 		if len(prim_list) == 1:
 			A = [
@@ -279,14 +292,14 @@ class HapticInterfacePoint():
 		#  a2 b2 c2  0 0  0
 		#  a3 b3 c3  0 0  0 ]
 
-		if len(prim_list) == 0:
-			x_godobj = self.god_pos_prev
-		else:
-			x_godobj = np.dot(np.linalg.inv(A), B)
+		# if len(prim_list) == 0:
+		# 	x_godobj = self.god_pos_prev
+		# else:
+		x_godobj = np.dot(np.linalg.inv(A), B)
 
 		#print("HIP POSITION ", self.current_position)
 		# print("PRIM LIST FINAL ", prim_list)
-		print("GO POSITION ", x_godobj)
+		# print("GO POSITION ", x_godobj)
 
 		return np.array([x_godobj[0], x_godobj[1], x_godobj[2]])
 
