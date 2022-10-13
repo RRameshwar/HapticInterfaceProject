@@ -14,6 +14,7 @@ import matplotlib.animation as animation
 from matplotlib import style
 
 import datetime as dt
+import time
 
 class HapticInterfacePoint():
 	def __init__(self, model, initial_position=[0, 0, 0]):
@@ -44,6 +45,8 @@ class HapticInterfacePoint():
 	## This function should move the HIP and (if colliding) the God object positions
 	def updatePos(self, transformation):			
 
+		time_start = time.time()
+
 		## Update previous hip position
 		self.previous_position = self.current_position
 		self.current_position = np.add(self.current_position, transformation)	
@@ -61,6 +64,9 @@ class HapticInterfacePoint():
 		print("CURRENT FORCE = ", round(np.linalg.norm(self.rendered_force),3))
 		# print("HIP PREV ", self.previous_position, " HIP NOW ", self.current_position, " GOD PREV ", self.god_pos_prev, " GOD NOW ", self.god_pos, " ACTIVE PLANES ", self.active_planes)
 		
+		time_end = time.time()
+
+		# print("REFRESH RATE", 1/(time_end - time_start))
 
 	## Iteratively update plane constraints. Find new constraints between hip and old god, and update god object
 	## THEN check constraints between new and old god and update god object AGAIN.

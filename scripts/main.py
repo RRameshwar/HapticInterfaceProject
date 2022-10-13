@@ -26,12 +26,15 @@ if __name__ == '__main__':
 	# model = ModelObject('tree.obj')
 	# model = ModelObject('actual_cube.obj')
 	# model = ModelObject('hex_prism.obj')
-	model = ModelObject('icosahedron.obj')
 
 	# model = Cube()
 	# model = ConcaveCube()
-	# model = ConcavePrism() ######## THIS OUR GUY
 	# model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
+
+
+	## Change object here:
+	model = ModelObject('icosahedron.obj')	
+	# model = ConcavePrism() 
 
 
 	checker = CollisionChecker(model) # From checker.py
@@ -54,6 +57,9 @@ if __name__ == '__main__':
 
 	penetrated = False
 	
+	time_old = 0
+	time_new = 0
+
 	while run == True:
 		
 		# Get user input (arrow keys)
@@ -87,5 +93,10 @@ if __name__ == '__main__':
 
 		# run = gl.render(collided_faces, hip)
 		run = gl.render(hip.active_planes, hip) # Now keeping active plane highlighted
+
+		# time_old = time_new
+		# time_new = time.time()
+		# print(time_new)
+		# print("REFRESH RATE", 1/(time_new - time_old))
 		
 
