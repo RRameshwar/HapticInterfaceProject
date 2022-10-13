@@ -17,6 +17,12 @@ To control the HIP, the keyboard arrow keys are used: up and down for Y-axis mot
 
 To control the camera, the mouse can be used to rotate the view. Also, the _w_ and _s_ keys will zoom in and out, respectively.
 
-## Note:
+## Notes:
 
 The simulation is not perfect, at times a collision with the object is not detected. In this situation, the god-object will be allowed to cross to a position where it should not be. At this point, you have two options: restart the simulation OR attempt another collision until it returns to the correct state.
+
+The _render_ module contains all the PyOpenGL and PyGame information and initializations. 
+The _HapticInterfacePoint_ module contains all the god calculations and handles updating the position of the HIP and god-object, updating the constraints, and calculating the forces.
+The _checker_ module just contains the line and point tests required to detect collision and update constraints.
+
+Reach out for any questions.
