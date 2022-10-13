@@ -22,11 +22,11 @@ if __name__ == '__main__':
 	#We tested a lot of objects. The bunny and tree were both poorly formed, and the bunny took a really long time to 
 	# render.
 
-	# model = ModelObject('dodecahedron.obj')
-	# model = ModelObject('bunny.obj')
-	# model = ModelObject('tree.obj')
-	# model = ModelObject('actual_cube.obj')
-	# model = ModelObject('hex_prism.obj')
+	# model = ModelObject('../objects/dodecahedron.obj')
+	# model = ModelObject('../objects/bunny.obj')
+	# model = ModelObject('../objects/tree.obj')
+	# model = ModelObject('../objects/actual_cube.obj')
+	# model = ModelObject('../objects/hex_prism.obj')
 
 	# model = Cube()
 	# model = ConcaveCube()
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
 	#2 model objects we used for the demo
 
-	model = ModelObject('icosahedron.obj')
+	model = ModelObject('../objects/icosahedron.obj')
 	# model = ConcavePrism() ######## THIS OUR GUY
 
 
