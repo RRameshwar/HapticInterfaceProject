@@ -27,10 +27,10 @@ if __name__ == '__main__':
 	# model = ModelObject('tree.obj')
 	# model = ModelObject('actual_cube.obj')
 	# model = ModelObject('hex_prism.obj')
+
 	# model = Cube()
 	# model = ConcaveCube()
 	# model = Pyramid(((1,0,0),(2, 2, 0),(1,2,0),(2, 1, 2)))
-
 
 	#2 model objects we used for the demo
 
@@ -39,7 +39,6 @@ if __name__ == '__main__':
 
 
 	# starting points for each object so we don't start inside the object
-
 	## Convex Vertex:
 	pointVertex = (0.5, 1.35, 0)
 	## Concave Vertex:
@@ -59,7 +58,7 @@ if __name__ == '__main__':
 	collision_time = 0
 	collided_faces = []
 	penetrated = False
-	
+
 	# The major while loop where we do all the work, as long as we haven't paused the render environment (by hitting 'p' or 'esc')
 	while run == True:
 		
@@ -88,4 +87,3 @@ if __name__ == '__main__':
 	
 		# Render all the things we have to render, now with updating information
 		run = gl.render(hip.active_planes, hip) # Now keeping active plane highlighted
-		

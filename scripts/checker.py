@@ -2,6 +2,10 @@ import numpy as np
 import time
 from myObject import *
 
+## The checker class handles the check we do when we want to know if we're colliding with planes or not.
+## We use this both to detect collision with the full object and to check for new constraint planes when we
+## are inside the object.
+
 class CollisionChecker():
 	def __init__(self, object):
 		self.modelObject = object
@@ -12,13 +16,12 @@ class CollisionChecker():
 	## This function should perform line-plane test, then if True, perform point-triangle test
 	## Two types of checks: collision with object and updating plain constraints
 	def detectCollision(self, test_faces, hip_position, test_position, constraint_test=False, concave=False):
-		# if not constraint_test:
-			# print("\n**** PERFORMING COLLISION DETECTION ****")
 
 		collision = False
 		colliding_faces = []
 		
-		# Check each face
+		# Check each face. If we're doing an object collision test this will be all the faces on the object,
+		# otherwise it'll just be possible adjacent planes that got passed in.
 		for face in test_faces:
 			face = list(face) # These are the indices corresponding to vertices
 			triangle_vertices = []
@@ -66,9 +69,9 @@ class CollisionChecker():
 			self.intersect_point = np.subtract(hip_dist_to_plane*testPos , test_dist_to_plane*hipPos)/np.subtract(hip_dist_to_plane , test_dist_to_plane)
 			return True
 
-
+	## Detect collision between a point and a triangle
 	def primitive_test(self, tri, p, concave):
-		## Detect collision between a point and a triangle
+
 		tri = np.array(tri)
 		p = np.array(p)
 		
@@ -81,14 +84,10 @@ class CollisionChecker():
 
 		
 		## Check collision conditions as a boolean list
+		## Some fudge here. If we know our model is concave we add some fudge here. TODO: figure out why we have to do this
 		if type(self.modelObject) == type(ConcavePrism()):
 			check = [alpha>=-0.05, beta>=-0.05, alpha+beta<=1.05]
 		else:
 			check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
 
-
-		# if concave:
-		# 	check = [alpha>=-0.1, beta>=-0.1, alpha+beta<=1.1]
-		# else:
-		# 	check = [alpha>=0.0, beta>=0.0, alpha+beta<=1.0]
 		return all(check)

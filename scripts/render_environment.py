@@ -6,6 +6,9 @@ from OpenGL.GLU import *
 
 from HapticInterfacePoint import *
 
+## The render class handles all the OpenGL stuff that we need to display 3D objects. It also uses pygame to handle taking
+## user input.
+
 class render_environment():
 	def __init__(self):
 		self.display = (1250, 850)
@@ -13,7 +16,6 @@ class render_environment():
 		screen = pg.display.set_mode(self.display, DOUBLEBUF|OPENGL)
 		glMatrixMode(GL_PROJECTION)
 		gluPerspective(45, (self.display[0]/self.display[1]), 0.5, 50.0)
-		#glOrtho(0, 1000, 750, 0, -1, 1)
 		
 		glRotatef(90, 0, 0, 0)
 		glTranslatef(0.0, 0.0, -20)
@@ -29,6 +31,7 @@ class render_environment():
 		self.transf = [0,0,0] # No transf at first
 		self.createOrigin()
 
+		# Sets the mouse in the middle of the display so we can use it to rotate views.
 		self.displayCenter = [screen.get_size()[i] // 4 for i in range(2)]
 		self.mouseMove = [0, 0]
 		pg.mouse.set_pos(self.displayCenter)
@@ -37,23 +40,23 @@ class render_environment():
 		self.paused = False
 		self.run = True
 
-
+	## Takes in vertices, edges, and faces and creates a 3D static object.
 	def createStaticObj(self,vertices,edges,faces):  # Only for a wireframe display (lines + edges)
 		self.staticVerts = vertices
 		self.staticEdges = edges
 		self.staticFaces = faces
 
-
+	## Creates a point that will represent both the HIP and the god object
 	def createHIP(self,vertex,size=10):
 		self.hipVert = vertex
 		self.hipSize = size
 
-
+	## Creates the lines that will display the axes at the origin
 	def createOrigin(self):
 		self.originVerts = ((0,0,0),(1,0,0),(0,1,0),(0,0,1))
 		self.originEdges = ((0,1),(0,2),(0,3))
 
-
+	## Draws the origin axes
 	def drawOrigin(self):
 		glBegin(GL_LINES)
 		for edge in self.originEdges:
@@ -63,7 +66,7 @@ class render_environment():
 				glVertex3fv(self.originVerts[vertex])
 		glEnd()
 
-
+	## Draws the wire frame around the static object
 	def drawWire(self):
 		glBegin(GL_LINES)
 		glColor4f(0,0,0,1)
@@ -72,7 +75,7 @@ class render_environment():
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
 
-
+	## Draws the faces of the static object. Highlights active planes.
 	def drawObject(self,prims):
 		glBegin(GL_TRIANGLES)
 		for i in range(0, len(self.staticFaces)):
@@ -84,7 +87,7 @@ class render_environment():
 				glVertex3fv(self.staticVerts[vertex])
 		glEnd()
 
-
+	## Draws the HIP in white given the current HIP position
 	def drawHIP(self, position):
 		glPointSize(self.hipSize)
 		glBegin(GL_POINTS)
@@ -92,6 +95,7 @@ class render_environment():
 		glVertex3f(*position)
 		glEnd()
 
+	## Draws the god object in blue given the current god object position
 	def drawGod(self, position):
 		glPointSize(self.hipSize)
 		glBegin(GL_POINTS)
@@ -99,7 +103,11 @@ class render_environment():
 		glVertex3f(*position)
 		glEnd()
 
-
+	## Takes in user input.
+		# Quit = ESC
+		# Pause = 'P'
+		# Rotate view = mouse motion
+	## Returns a transformation vector that moves the HIP
 	def userInput(self, hip):
 		for event in pg.event.get():
 			if event.type == pg.QUIT:
@@ -115,10 +123,10 @@ class render_environment():
 					self.mouseMove = [event.pos[i] - self.displayCenter[i] for i in range(2)]
 				pg.mouse.set_pos(self.displayCenter)    
 
+		# As long as we haven't paused it, we run this
 		if self.paused==False:
 			# get keys
 			keypress = pg.key.get_pressed()
-			#mouseMove = pg.mouse.get_rel()
 		
 			# init model view matrix
 			glLoadIdentity()
@@ -155,26 +163,20 @@ class render_environment():
 			# apply hip movement
 			if keypress[pg.K_UP]:
 				return [0, 0.055, 0]
-				# hip.updatePos([0, 0.03, 0])
 			if keypress[pg.K_DOWN]:
 				return [0, -0.055, 0]
-				# hip.updatePos([0, -0.03, 0])
 			if keypress[pg.K_LEFT]:
 				return [-0.055, 0, 0]
-				# hip.updatePos([-0.03, 0, 0])
 			if keypress[pg.K_RIGHT]:
 				return [0.055, 0, 0]
-				# hip.updatePos([0.03, 0, 0])
 			if keypress[pg.K_RETURN]:
 				return [0, 0, 0.055]
-				# hip.updatePos([0, 0, 0.03])
 			if keypress[pg.K_RSHIFT]:
 				return [0, 0, -0.055]
-				# hip.updatePos([0, 0, -0.03])
 		return [0, 0, 0]			
 
 
-
+	## Draws alll the things
 	def render(self, prims, hip):  ## Run this inside a loop in the top-level file.
 		
 		if self.paused == False:	
@@ -191,12 +193,3 @@ class render_environment():
 			pg.display.flip()
 			pg.time.wait(10)
 		return self.run
-
-
-
-def main():
-	render = render_enviroment()
-
-
-if __name__ == "__main__":
-	main()

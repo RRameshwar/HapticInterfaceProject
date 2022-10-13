@@ -1,5 +1,6 @@
 import numpy as np
 
+## Several objects we created by hand to test our implementation.
 
 class Pyramid():
 	def __init__(self, vertices):

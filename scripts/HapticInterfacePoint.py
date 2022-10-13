@@ -10,6 +10,7 @@ import numpy as np
 from myObject import *
 
 import datetime as dt
+import time
 
 ## The HIP class keeps track of everything to do with the HIP, including the god object and the force output.
 ## This is where we update the HIP position and also make all the calculations to update the god object position and
@@ -39,6 +40,8 @@ class HapticInterfacePoint():
 	## This function should move the HIP and (if colliding) the God object positions
 	def updatePos(self, transformation):			
 
+		time_start = time.time()
+
 		## Update previous hip position
 		self.previous_position = self.current_position
 		self.current_position = np.add(self.current_position, transformation)	
@@ -52,10 +55,13 @@ class HapticInterfacePoint():
 			self.god_pos_prev = self.god_pos
 			self.god_pos = self.previous_position
 			
-		# Calculate and print output force		
+		# Calculate and print output force		 
 		self.calculateForce()
 		print("CURRENT FORCE = ", round(np.linalg.norm(self.rendered_force),3))
-	
+		
+		# Calculate and print refresh rate
+		time_end = time.time()
+		print("REFRESH RATE", 1/(time_end - time_start))
 
 	## Iteratively update plane constraints. Find new constraints between hip and old god, and update god object
 	## THEN check constraints between new and old god and update god object AGAIN.
