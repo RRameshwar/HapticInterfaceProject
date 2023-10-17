@@ -17,6 +17,10 @@ To control the HIP, the keyboard arrow keys are used: up and down for Y-axis mot
 
 To control the camera, the mouse can be used to rotate the view. Also, the _w_ and _s_ keys will zoom in and out, respectively.
 
+## RESULTS:
+For a concave object, here a triangular prism:
+[test](concave.gif)
+
 ## Notes:
 
 The simulation is not perfect, at times a collision with the object is not detected. In this situation, the god-object will be allowed to cross to a position where it should not be. At this point, you have two options: restart the simulation OR attempt another collision until it returns to the correct state.
