@@ -19,7 +19,12 @@ To control the camera, the mouse can be used to rotate the view. Also, the _w_ a
 
 ## RESULTS:
 For a concave object, here a triangular prism:
+
 ![Alt text](concave.gif)
+
+And for a convex object, here a dodecahedron:
+
+![Alt text](convex.gif)
 
 ## Notes:
 
